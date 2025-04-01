@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Comfortaa } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "./components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -9,6 +10,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const comfortaa = Comfortaa({
+  variable: "--font-comfortaa",
   subsets: ["latin"],
 });
 
@@ -24,10 +30,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} antialiased h-screen overflow-hidden`}>
+        <nav className="w-full h-16" style={{boxShadow: "var(--shadow)"}}>
+          <Navbar />
+        </nav>
+        <div className="w-full overflow-auto" style={{height: "calc(100% - 4rem)"}}>
+          <main className="h-fit flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+            {children}
+          </main>
+          <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+
+          </footer>
+        </div>
       </body>
     </html>
   );
