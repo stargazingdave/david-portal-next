@@ -19,6 +19,39 @@ const defaultParams: ThunderParams = {
     crackleAmount: 1,
 };
 
+const thunderPresets: Record<string, Partial<ThunderParams>> = {
+    "Distant Rumble": {
+        distance: 8,
+        burstCount: 2,
+        filterFreq: 700,
+        reverbDuration: 5,
+        reverbDecay: 4,
+        subLevel: 0.1,
+        crackleAmount: 0.3,
+        highPassFreq: 80,
+    },
+    "Epic Crack": {
+        distance: 3,
+        burstCount: 4,
+        filterFreq: 900,
+        reverbDuration: 4,
+        reverbDecay: 4,
+        subLevel: 0.2,
+        crackleAmount: 1,
+        highPassFreq: 200,
+    },
+    "Storm Wall": {
+        distance: 5,
+        burstCount: 6,
+        filterFreq: 900,
+        reverbDuration: 3.5,
+        reverbDecay: 3.5,
+        subLevel: 0.5,
+        crackleAmount: 0.7,
+        highPassFreq: 50,
+    },
+};
+
 export default function ThunderSynth() {
     const [params, setParams] = useState<ThunderParams>(defaultParams);
     const [rumbleFreqStart, setRumbleFreqStart] = useState(30);
@@ -115,6 +148,25 @@ export default function ThunderSynth() {
             >
                 ⚡ Trigger Thunder
             </button>
+
+            <select
+                onChange={(e) => {
+                    const selected = e.target.value;
+                    if (thunderPresets[selected]) {
+                        const newParams = { ...params, ...thunderPresets[selected] };
+                        setParams(newParams);
+                        thunderRef.current?.setParams(newParams);
+                        thunderRef.current?.setGeneratedReverb();
+                    }
+                }}
+            >
+                <option value="">Choose Preset</option>
+                {Object.keys(thunderPresets).map((name) => (
+                    <option key={name} value={name}>
+                        {name}
+                    </option>
+                ))}
+            </select>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
