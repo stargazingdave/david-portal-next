@@ -13,6 +13,7 @@ const defaultParams: ThunderParams = {
     delayMs: 0,
     reverbDuration: 2,
     reverbDecay: 2,
+    reverbWetLevel: 0.4,
     subLevel: 0.1,
     panRange: 1,
     highPassFreq: 20,
@@ -242,6 +243,18 @@ export default function ThunderSynth() {
                 </div>
 
                 <div>
+                    <label>Reverb Wet Level: {params.reverbWetLevel}</label>
+                    <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={params.reverbWetLevel ?? 0.4}
+                        onChange={(e) => updateParam("reverbWetLevel", parseFloat(e.target.value))}
+                    />
+                </div>
+
+                <div>
                     <label>Crackle Amount: {params.crackleAmount}</label>
                     <input
                         type="range"
@@ -254,7 +267,7 @@ export default function ThunderSynth() {
                 </div>
 
                 {Object.entries(params).map(([key, value]) => {
-                    if (["distance", "highPassFreq", "crackleAmount"].includes(key)) return null;
+                    if (["distance", "highPassFreq", "crackleAmount", "reverbWetLevel"].includes(key)) return null;
                     const numericValue = value as number;
                     let min = 0, max = 5, step = 0.1;
                     if (key === "burstCount") {

@@ -10,6 +10,7 @@ export interface ThunderParams {
     delayMs?: number;
     reverbDuration?: number;
     reverbDecay?: number;
+    reverbWetLevel?: number;
     subLevel?: number;
     panRange?: number;
     highPassFreq?: number;
@@ -33,6 +34,7 @@ export class ThunderGenerator {
             panRange: 1,
             reverbDuration: 2,
             reverbDecay: 2,
+            reverbWetLevel: 0.4,
             delayMs: 0,
             highPassFreq: 20,
             crackleAmount: 1,
@@ -67,7 +69,8 @@ export class ThunderGenerator {
         const delay = this.params.delayMs ?? 0;
         setTimeout(() => {
             for (let i = 0; i < this.params.burstCount; i++) {
-                setTimeout(() => this._playSingleBurst(this.params.duration, this.params.volume), Math.random() * 800);
+                const burstDelay = i * 250 + Math.random() * 100;
+                setTimeout(() => this._playSingleBurst(this.params.duration, this.params.volume), burstDelay);
             }
         }, delay);
     }
@@ -79,9 +82,10 @@ export class ThunderGenerator {
         const data = buffer.getChannelData(0);
         const crackle = this.params.crackleAmount ?? 1;
         for (let i = 0; i < data.length; i++) {
-            const decay = Math.exp(-i / (this.ctx.sampleRate * 0.4));
+            const buildUp = Math.min(1, i / (this.ctx.sampleRate * (duration * 0.25)));
+            const decay = Math.exp(-i / (this.ctx.sampleRate * duration));
             const noise = (Math.random() * 2 - 1) * Math.pow(Math.random(), 1 - crackle);
-            data[i] = noise * decay;
+            data[i] = noise * decay * buildUp;
         }
 
         const noise = this.ctx.createBufferSource();
@@ -89,44 +93,79 @@ export class ThunderGenerator {
 
         const lowpass = this.ctx.createBiquadFilter();
         lowpass.type = 'lowpass';
-        lowpass.frequency.value = this.params.filterFreq;
+        lowpass.frequency.setValueAtTime(this.params.filterFreq, now);
+        lowpass.frequency.exponentialRampToValueAtTime(200, now + duration * 1.2);
 
         const highpass = this.ctx.createBiquadFilter();
         highpass.type = 'highpass';
         highpass.frequency.value = this.params.highPassFreq ?? 20;
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(volume, now);
-        gain.gain.exponentialRampToValueAtTime(volume * 0.4, now + duration * 0.5);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1.5);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(volume, now + 0.3);
+        gain.gain.exponentialRampToValueAtTime(volume * 0.5, now + duration * 0.7);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 2.5);
 
-        const panner = this.ctx.createStereoPanner();
+        const pan = this.ctx.createStereoPanner();
         const panRange = this.params.panRange ?? 1;
-        panner.pan.value = (Math.random() * 2 - 1) * panRange;
+        const basePan = (Math.random() * 2 - 1) * panRange;
+        pan.pan.setValueAtTime(basePan, now);
+        pan.pan.linearRampToValueAtTime(-basePan, now + duration);
 
-        const useReverb = !!this.reverbBuffer;
-        if (useReverb) {
-            const convolver = this.ctx.createConvolver();
-            convolver.buffer = this.reverbBuffer!;
-            noise.connect(lowpass).connect(highpass).connect(gain);
-            gain.connect(convolver).connect(panner).connect(this.output);
-            gain.connect(panner).connect(this.output);
-        } else {
-            noise.connect(lowpass).connect(highpass).connect(gain).connect(panner).connect(this.output);
+        const dryGain = this.ctx.createGain();
+        dryGain.gain.value = 1;
+
+        const wetGain = this.ctx.createGain();
+        wetGain.gain.value = this.params.reverbWetLevel ?? 0.4;
+
+        const convolver = this.ctx.createConvolver();
+        if (this.reverbBuffer) convolver.buffer = this.reverbBuffer;
+
+        // Optional highpass before reverb to cut sub mud
+        const preVerbFilter = this.ctx.createBiquadFilter();
+        preVerbFilter.type = "highpass";
+        preVerbFilter.frequency.value = 250;
+
+        noise.connect(lowpass).connect(highpass).connect(gain);
+        gain.connect(pan);
+        pan.connect(dryGain).connect(this.output);
+
+        if (this.reverbBuffer) {
+            gain.connect(preVerbFilter).connect(convolver).connect(wetGain).connect(this.output);
         }
 
-        const osc = this.ctx.createOscillator();
-        osc.type = "sine";
-        osc.frequency.value = 40 + Math.random() * 10;
+        const rumbleOsc = this.ctx.createOscillator();
+        rumbleOsc.type = "sine";
+        rumbleOsc.frequency.setValueAtTime(30, now);
+        rumbleOsc.frequency.linearRampToValueAtTime(20, now + duration);
 
         const subGain = this.ctx.createGain();
         subGain.gain.setValueAtTime((this.params.subLevel ?? 0.1) * volume, now);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 2);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 2.5);
 
-        osc.connect(subGain).connect(this.output);
-        osc.start();
-        osc.stop(now + duration * 2);
+        rumbleOsc.connect(subGain).connect(this.output);
+        rumbleOsc.start();
+        rumbleOsc.stop(now + duration * 2.5);
+
+        const tailBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate * duration * 1.5, this.ctx.sampleRate);
+        const tailData = tailBuffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < tailData.length; i++) {
+            const white = Math.random() * 2 - 1;
+            tailData[i] = (lastOut + 0.02 * white) / 1.02;
+            lastOut = tailData[i];
+            tailData[i] *= 3.5 * Math.exp(-i / (this.ctx.sampleRate * duration));
+        }
+        const brown = this.ctx.createBufferSource();
+        brown.buffer = tailBuffer;
+
+        const brownGain = this.ctx.createGain();
+        brownGain.gain.setValueAtTime(volume * 0.2, now);
+        brownGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 2.5);
+
+        brown.connect(brownGain).connect(this.output);
 
         noise.start();
+        brown.start();
     }
 }

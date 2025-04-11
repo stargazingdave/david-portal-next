@@ -1,7 +1,5 @@
-export default function Home() {
-  return (
-    <div className="w-full h-[4000px]">
-        
-    </div>
-  );
+import { HomePage } from "./HomePage";
+
+export default async function Home() {
+  return <HomePage />;
 }

@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "@dpdev/base-react": {
+      "signature": "8f6d1215a8bcf448c10357fdd3ca11d1",
+      "file": true
+    }
+  }
+}

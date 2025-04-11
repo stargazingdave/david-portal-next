@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Comfortaa } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
+import { Sidebar } from "./components/Sidebar";
+import ClientLayout from "./ClientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,18 +32,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} antialiased h-screen overflow-hidden`}>
-        <nav className="w-full h-16" style={{boxShadow: "var(--shadow)"}}>
-          <Navbar />
-        </nav>
-        <div className="w-full overflow-auto" style={{height: "calc(100% - 4rem)"}}>
-          <main className="h-fit flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-            {children}
-          </main>
-          <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-
-          </footer>
-        </div>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} antialiased h-screen w-screen overflow-hidden`}>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
