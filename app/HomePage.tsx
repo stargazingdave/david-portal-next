@@ -23,7 +23,7 @@ export function HomePage() {
     <div className="w-full flex flex-col items-center">
       <Button
         color="green"
-        hoverColor="blue"
+        hoverBgColor="blue"
       >
         TEST
       </Button>
