@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@/.yalc/@dpdev/base-react/dist';
+import { Card } from '@dpdev/nucleard';
 import { CodeProject, CodeProjectTech } from '@/types/CodeProject';
 import Image from 'next/image';
 import { FC, JSX, useEffect, useState } from 'react';

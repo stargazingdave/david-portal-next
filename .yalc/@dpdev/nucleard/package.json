@@ -1,5 +1,5 @@
 {
-  "name": "@dpdev/base-react",
+  "name": "@dpdev/nucleard",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -24,5 +24,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "yalcSig": "8f6d1215a8bcf448c10357fdd3ca11d1"
+  "yalcSig": "9cae51eaca64bda95981686047ff8e6a"
 }

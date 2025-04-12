@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { Button, Card } from "@dpdev/base-react";
+import { Button, Card } from "@dpdev/nucleard";
 import { useRouter } from "next/navigation";
 
 export function HomePage() {

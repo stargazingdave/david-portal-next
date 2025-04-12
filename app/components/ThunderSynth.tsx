@@ -1,4 +1,4 @@
-// ThunderSynth.tsx
+// ThunderSynth.tsx (UI with 10-band EQ + rumble controls)
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
@@ -18,56 +18,19 @@ const defaultParams: ThunderParams = {
     panRange: 1,
     highPassFreq: 20,
     crackleAmount: 1,
+    eqGains: new Array(10).fill(0)
 };
 
-const thunderPresets: Record<string, Partial<ThunderParams>> = {
-    "Distant Rumble": {
-        distance: 8,
-        burstCount: 2,
-        filterFreq: 700,
-        reverbDuration: 5,
-        reverbDecay: 4,
-        subLevel: 0.1,
-        crackleAmount: 0.3,
-        highPassFreq: 80,
-    },
-    "Epic Crack": {
-        distance: 3,
-        burstCount: 4,
-        filterFreq: 900,
-        reverbDuration: 4,
-        reverbDecay: 4,
-        subLevel: 0.2,
-        crackleAmount: 1,
-        highPassFreq: 200,
-    },
-    "Storm Wall": {
-        distance: 5,
-        burstCount: 6,
-        filterFreq: 900,
-        reverbDuration: 3.5,
-        reverbDecay: 3.5,
-        subLevel: 0.5,
-        crackleAmount: 0.7,
-        highPassFreq: 50,
-    },
-};
+const eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
 export default function ThunderSynth() {
     const [params, setParams] = useState<ThunderParams>(defaultParams);
     const [rumbleFreqStart, setRumbleFreqStart] = useState(30);
     const [rumbleFreqEnd, setRumbleFreqEnd] = useState(20);
     const [rumbleVolume, setRumbleVolume] = useState(0.2);
-    const [rumbleDecay, setRumbleDecay] = useState(3);
+    const [rumbleDecay, setRumbleDecay] = useState(8);
 
     const thunderRef = useRef<ThunderGenerator | null>(null);
-    const ctxRef = useRef<AudioContext | null>(null);
-    const rumbleConfigRef = useRef({
-        freqStart: rumbleFreqStart,
-        freqEnd: rumbleFreqEnd,
-        volume: rumbleVolume,
-        decay: rumbleDecay,
-    });
 
     useEffect(() => {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -78,67 +41,38 @@ export default function ThunderSynth() {
         const originalTrigger = tg.triggerThunder.bind(tg);
         tg.triggerThunder = async () => {
             if (ctx.state !== "running") {
-                try {
-                    await ctx.resume();
-                } catch (err) {
-                    console.error("Failed to resume AudioContext:", err);
-                    return;
-                }
+                await ctx.resume();
             }
-
-            const { freqStart, freqEnd, volume, decay } = rumbleConfigRef.current;
-
             const now = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-
-            const safeFreqEnd = Math.min(freqEnd, freqStart - 0.01);
-            const safeDecay = Math.max(decay, 0.1);
-            const safeVolume = Math.max(volume, 0.001);
-
             osc.type = "sine";
-            osc.frequency.setValueAtTime(freqStart, now);
-            osc.frequency.linearRampToValueAtTime(safeFreqEnd, now + safeDecay);
-
-            gain.gain.setValueAtTime(safeVolume, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + safeDecay);
-
-            try {
-                osc.connect(gain).connect(ctx.destination);
-                osc.start(now + 0.01);
-                osc.stop(now + safeDecay + 0.02);
-            } catch (err) {
-                console.error("Oscillator error:", err);
-            }
-
+            osc.frequency.setValueAtTime(rumbleFreqStart, now);
+            osc.frequency.linearRampToValueAtTime(rumbleFreqEnd, now + rumbleDecay);
+            gain.gain.setValueAtTime(rumbleVolume, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + rumbleDecay);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start();
+            osc.stop(now + rumbleDecay);
             originalTrigger();
         };
 
         thunderRef.current = tg;
-        ctxRef.current = ctx;
     }, []);
 
-    useEffect(() => {
-        rumbleConfigRef.current = {
-            freqStart: rumbleFreqStart,
-            freqEnd: rumbleFreqEnd,
-            volume: rumbleVolume,
-            decay: rumbleDecay,
-        };
-    }, [rumbleFreqStart, rumbleFreqEnd, rumbleVolume, rumbleDecay]);
-
-    const updateParam = (key: keyof ThunderParams, value: number) => {
-        let newParams = { ...params, [key]: value };
-
-        if (key === "distance") {
-            thunderRef.current?.setParams(newParams);
-            thunderRef.current?.setGeneratedReverb();
-            setParams({ ...newParams });
-        } else {
-            setParams(newParams);
-            thunderRef.current?.setParams(newParams);
+    const updateParam = (key: keyof ThunderParams, value: any) => {
+        const newParams = { ...params, [key]: value };
+        thunderRef.current?.setParams(newParams);
+        if (key === "reverbDuration" || key === "reverbDecay") {
             thunderRef.current?.setGeneratedReverb();
         }
+        setParams(newParams);
+    };
+
+    const updateEqGain = (index: number, value: number) => {
+        const newEqGains = [...(params.eqGains ?? new Array(10).fill(0))];
+        newEqGains[index] = value;
+        updateParam("eqGains", newEqGains);
     };
 
     return (
@@ -150,145 +84,70 @@ export default function ThunderSynth() {
                 ⚡ Trigger Thunder
             </button>
 
-            <select
-                onChange={(e) => {
-                    const selected = e.target.value;
-                    if (thunderPresets[selected]) {
-                        const newParams = { ...params, ...thunderPresets[selected] };
-                        setParams(newParams);
-                        thunderRef.current?.setParams(newParams);
-                        thunderRef.current?.setGeneratedReverb();
-                    }
-                }}
-            >
-                <option value="">Choose Preset</option>
-                {Object.keys(thunderPresets).map((name) => (
-                    <option key={name} value={name}>
-                        {name}
-                    </option>
+            <h2 className="text-lg font-bold mt-4">EQ Settings</h2>
+            <div className="flex">
+                {eqFrequencies.map((freq, i) => (
+                    <div key={freq} className="flex flex-col items-center gap-16">
+                        <label className="text-sm">{freq} Hz</label>
+                        <input
+                            type="range"
+                            min={-24}
+                            max={24}
+                            step={1}
+                            value={params.eqGains?.[i] ?? 0}
+                            onChange={(e) => updateEqGain(i, parseFloat(e.target.value))}
+                            className="rotate-[-90deg]"
+                        />
+                        <span className="text-xs">{params.eqGains?.[i] ?? 0} dB</span>
+                    </div>
                 ))}
-            </select>
+            </div>
 
+            <h2 className="text-lg font-bold mt-6">Rumble Settings</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <label>Rumble Start Freq: {rumbleFreqStart} Hz</label>
+                    <input type="range" min={10} max={100} value={rumbleFreqStart} step={1} onChange={(e) => setRumbleFreqStart(parseFloat(e.target.value))} />
+                </div>
+                <div>
+                    <label>Rumble End Freq: {rumbleFreqEnd} Hz</label>
+                    <input type="range" min={5} max={rumbleFreqStart} value={rumbleFreqEnd} step={1} onChange={(e) => setRumbleFreqEnd(parseFloat(e.target.value))} />
+                </div>
+                <div>
+                    <label>Rumble Volume: {rumbleVolume}</label>
+                    <input type="range" min={0} max={1} value={rumbleVolume} step={0.01} onChange={(e) => setRumbleVolume(parseFloat(e.target.value))} />
+                </div>
+                <div>
+                    <label>Rumble Decay: {rumbleDecay}s</label>
+                    <input type="range" min={0.1} max={10} value={rumbleDecay} step={0.1} onChange={(e) => setRumbleDecay(parseFloat(e.target.value))} />
+                </div>
+            </div>
+
+            <h2 className="text-lg font-bold mt-6">Thunder Settings</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label>Rumble Start Freq: {rumbleFreqStart.toFixed(1)} Hz</label>
-                    <input
-                        type="range"
-                        min={10}
-                        max={100}
-                        step={0.1}
-                        value={rumbleFreqStart}
-                        onChange={(e) => setRumbleFreqStart(parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Rumble End Freq: {rumbleFreqEnd.toFixed(1)} Hz</label>
-                    <input
-                        type="range"
-                        min={5}
-                        max={rumbleFreqStart}
-                        step={0.1}
-                        value={rumbleFreqEnd}
-                        onChange={(e) => setRumbleFreqEnd(parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Rumble Volume: {rumbleVolume.toFixed(2)}</label>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={rumbleVolume}
-                        onChange={(e) => setRumbleVolume(parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Rumble Decay: {rumbleDecay.toFixed(1)}s</label>
-                    <input
-                        type="range"
-                        min={0.5}
-                        max={10}
-                        step={0.1}
-                        value={rumbleDecay}
-                        onChange={(e) => setRumbleDecay(parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Distance (km): {params.distance ?? "(none)"}</label>
-                    <input
-                        type="range"
-                        min={2}
-                        max={10}
-                        step={0.1}
-                        value={params.distance ?? 0}
-                        onChange={(e) => updateParam("distance", parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>High-pass Filter: {params.highPassFreq} Hz</label>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1000}
-                        step={10}
-                        value={params.highPassFreq}
-                        onChange={(e) => updateParam("highPassFreq", parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Reverb Wet Level: {params.reverbWetLevel}</label>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={params.reverbWetLevel ?? 0.4}
-                        onChange={(e) => updateParam("reverbWetLevel", parseFloat(e.target.value))}
-                    />
-                </div>
-
-                <div>
-                    <label>Crackle Amount: {params.crackleAmount}</label>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={params.crackleAmount}
-                        onChange={(e) => updateParam("crackleAmount", parseFloat(e.target.value))}
-                    />
-                </div>
-
                 {Object.entries(params).map(([key, value]) => {
-                    if (["distance", "highPassFreq", "crackleAmount", "reverbWetLevel"].includes(key)) return null;
+                    if (key === "eqGains") return null;
                     const numericValue = value as number;
-                    let min = 0, max = 5, step = 0.1;
+                    let min = 0, max = 100, step = 0.1;
                     if (key === "burstCount") {
-                        min = 1;
-                        max = 10;
-                        step = 1;
+                        min = 1; max = 10; step = 1;
                     } else if (key === "filterFreq") {
                         max = 3000;
                     } else if (key === "delayMs") {
                         max = 10000;
-                    } else if (key === "panRange") {
-                        max = 1;
-                    } else if (key === "subLevel") {
-                        max = 1;
+                    } else if (["panRange", "subLevel", "reverbWetLevel", "crackleAmount"].includes(key)) {
+                        max = 1; step = 0.01;
+                    } else if (key === "highPassFreq") {
+                        max = 1000; step = 10;
+                    } else if (key === "volume") {
+                        max = 2; step = 0.01;
+                    } else if (key === "distance") {
+                        min = 1; max = 20;
                     }
 
                     return (
                         <div key={key} className="flex flex-col">
-                            <label>
-                                {key}: {numericValue}
-                            </label>
+                            <label>{key}: {numericValue}</label>
                             <input
                                 type="range"
                                 min={min}

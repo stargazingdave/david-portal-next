@@ -1,8 +1,8 @@
 {
   "version": "v1",
   "packages": {
-    "@dpdev/base-react": {
-      "signature": "8f6d1215a8bcf448c10357fdd3ca11d1",
+    "@dpdev/nucleard": {
+      "signature": "9cae51eaca64bda95981686047ff8e6a",
       "file": true
     }
   }

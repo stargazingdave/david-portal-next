@@ -4,7 +4,6 @@ const config: Config = {
     content: [
         './app/**/*.{ts,tsx}',
         './components/**/*.{ts,tsx}',
-        './node_modules/@dpdev/base-react/**/*.{js,ts,jsx,tsx}'
     ],
     theme: {
         extend: {

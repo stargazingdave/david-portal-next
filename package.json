@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@dpdev/base-react": "file:.yalc/@dpdev/base-react",
+    "@dpdev/nucleard": "file:.yalc/@dpdev/nucleard",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

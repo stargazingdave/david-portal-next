@@ -1,11 +1,39 @@
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  Button: () => Button,
+  Card: () => Card
+});
+module.exports = __toCommonJS(index_exports);
+
 // src/components/Button.tsx
-import { useEffect, useState } from "react";
-import { jsx } from "react/jsx-runtime";
+var import_react = require("react");
+var import_jsx_runtime = require("react/jsx-runtime");
 function adjustColorBrightness(hex, amount) {
   if (hex === "none") return hex;
   const col = hex.replace("#", "");
   const num = parseInt(col, 16);
   let r = (num >> 16) + amount;
+  ``;
   let g = (num >> 8 & 255) + amount;
   let b = (num & 255) + amount;
   r = Math.max(Math.min(255, r), 0);
@@ -32,8 +60,8 @@ var Button = ({
   style,
   ...props
 }) => {
-  const [finalTextColor, setFinalTextColor] = useState(textColor ?? "#000000");
-  useEffect(() => {
+  const [finalTextColor, setFinalTextColor] = (0, import_react.useState)(textColor ?? "#000000");
+  (0, import_react.useEffect)(() => {
     if (!textColor) {
       const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
       setFinalTextColor(prefersDark ? "#ffffff" : "#000000");
@@ -56,7 +84,7 @@ var Button = ({
     color: finalTextColor,
     ...style
   };
-  return /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
     "button",
     {
       className,
@@ -77,7 +105,7 @@ var Button = ({
 };
 
 // src/components/Card.tsx
-import { jsx as jsx2, jsxs } from "react/jsx-runtime";
+var import_jsx_runtime2 = require("react/jsx-runtime");
 var Card = ({
   bgColor,
   textColor,
@@ -103,8 +131,8 @@ var Card = ({
     overflow: "hidden",
     ...style
   };
-  return /* @__PURE__ */ jsxs("div", { className, style: baseStyle, ...props, children: [
-    overlayColor && /* @__PURE__ */ jsx2(
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className, style: baseStyle, ...props, children: [
+    overlayColor && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
       "div",
       {
         style: {
@@ -115,11 +143,7 @@ var Card = ({
         }
       }
     ),
-    /* @__PURE__ */ jsx2("div", { style: { position: "relative", zIndex: 1 }, children })
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { position: "relative", zIndex: 1 }, children })
   ] });
 };
-export {
-  Button,
-  Card
-};
-//# sourceMappingURL=index.mjs.map
+//# sourceMappingURL=index.js.map

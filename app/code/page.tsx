@@ -43,13 +43,13 @@ const getCodeProjects = (): CodeProject[] => {
             tech: ['typescript']
         },
         {
-            title: 'BaseD',
+            title: 'NuclearD',
             type: 'library',
             description:
                 'A React component library for basic general-use themed components.',
             image: {
-                light: '/images/dbase-logo-light.png',
-                dark: '/images/dbase-logo-dark.png',
+                light: '/images/nucleard-logo.png',
+                dark: '/images/nucleard-logo.png',
             },
             links: {
                 docs: 'https://yourdomain.com/dbase/docs',

@@ -1,4 +1,4 @@
-import { Button } from "@dpdev/base-react";
+import { Button } from "@dpdev/nucleard";
 import Image from "next/image";
 import { FC } from "react";
 import { HiOutlineMenu } from "react-icons/hi";
