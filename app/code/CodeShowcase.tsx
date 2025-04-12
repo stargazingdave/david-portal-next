@@ -69,7 +69,7 @@ export const CodeShowcase: FC<CodeShowcaseProps> = ({ projects }) => {
                     <div className="relative sm:w-50 sm:h-50 w-32 h-32 flex-shrink-0">
                         <Image
                             src={isDarkMode ? project.image.dark : project.image.light}
-                            alt={project.title}
+                            alt={project.description}
                             fill
                             className='p-4 object-contain'
                         />

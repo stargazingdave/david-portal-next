@@ -60,7 +60,7 @@ const getCodeProjects = (): CodeProject[] => {
             tech: ['react', 'tailwind', 'typescript']
         },
         {
-            title: 'Snake XL',
+            title: <p>Snake <span className="italic">XL</span></p>,
             type: 'game',
             description:
                 'An extra-everything Snake game built as a React component as part of dannykrivosh.com.',
