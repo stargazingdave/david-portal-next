@@ -29,8 +29,9 @@ const eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
 export default function ThunderSynth() {
     const [params, setParams] = useState<ThunderParams>(() => {
-        const saved = localStorage.getItem("thunder_preset");
-        return saved ? JSON.parse(saved) : defaultParams;
+        // const saved = localStorage.getItem("thunder_preset");
+        // return saved ? JSON.parse(saved) : defaultParams;
+        return defaultParams;
     });
 
     const thunderRef = useRef<ThunderGenerator | null>(null);
