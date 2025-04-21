@@ -1,15 +1,15 @@
 // ThunderSynth.tsx (UI with 10-band EQ + rumble controls)
 'use client';
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { ThunderParams, ThunderGenerator } from "../classes/ThunderGenerator";
+import { Equalizer } from "./Equalizer";
 
 const defaultParams: ThunderParams = {
     volume: 1,
     duration: 2,
     filterFreq: 750,
     burstCount: 3,
-    distance: 5,
     delayMs: 0,
     reverbDuration: 2,
     reverbDecay: 2,
@@ -18,17 +18,20 @@ const defaultParams: ThunderParams = {
     panRange: 1,
     highPassFreq: 20,
     crackleAmount: 1,
-    eqGains: new Array(10).fill(0)
+    eqGains: new Array(10).fill(0),
+    rumbleFreqStart: 30,
+    rumbleFreqEnd: 20,
+    rumbleVolume: 0.2,
+    rumbleDecay: 8,
 };
 
 const eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
 export default function ThunderSynth() {
-    const [params, setParams] = useState<ThunderParams>(defaultParams);
-    const [rumbleFreqStart, setRumbleFreqStart] = useState(30);
-    const [rumbleFreqEnd, setRumbleFreqEnd] = useState(20);
-    const [rumbleVolume, setRumbleVolume] = useState(0.2);
-    const [rumbleDecay, setRumbleDecay] = useState(8);
+    const [params, setParams] = useState<ThunderParams>(() => {
+        const saved = localStorage.getItem("thunder_preset");
+        return saved ? JSON.parse(saved) : defaultParams;
+    });
 
     const thunderRef = useRef<ThunderGenerator | null>(null);
 
@@ -37,26 +40,6 @@ export default function ThunderSynth() {
         const tg = new ThunderGenerator(ctx);
         tg.setParams(params);
         tg.setGeneratedReverb();
-
-        const originalTrigger = tg.triggerThunder.bind(tg);
-        tg.triggerThunder = async () => {
-            if (ctx.state !== "running") {
-                await ctx.resume();
-            }
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(rumbleFreqStart, now);
-            osc.frequency.linearRampToValueAtTime(rumbleFreqEnd, now + rumbleDecay);
-            gain.gain.setValueAtTime(rumbleVolume, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + rumbleDecay);
-            osc.connect(gain).connect(ctx.destination);
-            osc.start();
-            osc.stop(now + rumbleDecay);
-            originalTrigger();
-        };
-
         thunderRef.current = tg;
     }, []);
 
@@ -67,6 +50,7 @@ export default function ThunderSynth() {
             thunderRef.current?.setGeneratedReverb();
         }
         setParams(newParams);
+        localStorage.setItem("thunder_preset", JSON.stringify(newParams));
     };
 
     const updateEqGain = (index: number, value: number) => {
@@ -84,49 +68,20 @@ export default function ThunderSynth() {
                 ⚡ Trigger Thunder
             </button>
 
-            <h2 className="text-lg font-bold mt-4">EQ Settings</h2>
-            <div className="flex">
-                {eqFrequencies.map((freq, i) => (
-                    <div key={freq} className="flex flex-col items-center gap-16">
-                        <label className="text-sm">{freq} Hz</label>
-                        <input
-                            type="range"
-                            min={-24}
-                            max={24}
-                            step={1}
-                            value={params.eqGains?.[i] ?? 0}
-                            onChange={(e) => updateEqGain(i, parseFloat(e.target.value))}
-                            className="rotate-[-90deg]"
-                        />
-                        <span className="text-xs">{params.eqGains?.[i] ?? 0} dB</span>
-                    </div>
-                ))}
-            </div>
+            <Equalizer gains={params.eqGains} freqs={eqFrequencies} onChange={updateEqGain} />
 
-            <h2 className="text-lg font-bold mt-6">Rumble Settings</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                    <label>Rumble Start Freq: {rumbleFreqStart} Hz</label>
-                    <input type="range" min={10} max={100} value={rumbleFreqStart} step={1} onChange={(e) => setRumbleFreqStart(parseFloat(e.target.value))} />
-                </div>
-                <div>
-                    <label>Rumble End Freq: {rumbleFreqEnd} Hz</label>
-                    <input type="range" min={5} max={rumbleFreqStart} value={rumbleFreqEnd} step={1} onChange={(e) => setRumbleFreqEnd(parseFloat(e.target.value))} />
-                </div>
-                <div>
-                    <label>Rumble Volume: {rumbleVolume}</label>
-                    <input type="range" min={0} max={1} value={rumbleVolume} step={0.01} onChange={(e) => setRumbleVolume(parseFloat(e.target.value))} />
-                </div>
-                <div>
-                    <label>Rumble Decay: {rumbleDecay}s</label>
-                    <input type="range" min={0.1} max={10} value={rumbleDecay} step={0.1} onChange={(e) => setRumbleDecay(parseFloat(e.target.value))} />
-                </div>
-            </div>
+            <RumbleSettings
+                rumbleFreqStart={params.rumbleFreqStart!}
+                rumbleFreqEnd={params.rumbleFreqEnd!}
+                rumbleVolume={params.rumbleVolume!}
+                rumbleDecay={params.rumbleDecay!}
+                onChange={(key, value) => updateParam(key as keyof ThunderParams, value)}
+            />
 
             <h2 className="text-lg font-bold mt-6">Thunder Settings</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(params).map(([key, value]) => {
-                    if (key === "eqGains") return null;
+                    if (["eqGains", "rumbleFreqStart", "rumbleFreqEnd", "rumbleVolume", "rumbleDecay", "distance"].includes(key)) return null;
                     const numericValue = value as number;
                     let min = 0, max = 100, step = 0.1;
                     if (key === "burstCount") {
@@ -141,8 +96,6 @@ export default function ThunderSynth() {
                         max = 1000; step = 10;
                     } else if (key === "volume") {
                         max = 2; step = 0.01;
-                    } else if (key === "distance") {
-                        min = 1; max = 20;
                     }
 
                     return (
@@ -163,3 +116,109 @@ export default function ThunderSynth() {
         </div>
     );
 }
+
+
+
+// RumbleSettings in the style of the equalizer above
+interface RumbleSettingsProps {
+    rumbleFreqStart: number
+    rumbleFreqEnd: number
+    rumbleVolume: number
+    rumbleDecay: number
+    onChange: (key: string, value: number) => void
+}
+
+const RumbleSettings: FC<RumbleSettingsProps> = ({ rumbleFreqStart, rumbleFreqEnd, rumbleVolume, rumbleDecay, onChange }) => {
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    const handleDrag = (e: React.MouseEvent, key: string) => {
+        const container = containerRef.current
+        if (!container) return
+
+        const rect = container.getBoundingClientRect()
+        const height = rect.height
+        const y = e.clientY - rect.top
+        const clampedY = Math.max(0, Math.min(height, y))
+        const percent = 1 - clampedY / height
+        const newValue = key === "rumbleVolume" ? percent : (key === "rumbleDecay" ? 0.1 + percent * 9.9 : 10 + percent * 90)
+        onChange(key, Math.round(newValue * 10) / 10)
+    }
+
+    return (
+        <div
+            ref={containerRef}
+            className="flex gap-1 justify-center items-end p-4 rounded-xl shadow-xl h-48 w-fit"
+        >
+            <div className="flex flex-col items-center w-10 cursor-pointer select-none" onMouseDown={(e) => {
+                e.preventDefault();
+                const move = (e: MouseEvent) => handleDrag(e as unknown as React.MouseEvent, "rumbleFreqStart");
+                const up = () => {
+                    window.removeEventListener('mousemove', move)
+                    window.removeEventListener('mouseup', up)
+                };
+                window.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', up);
+                handleDrag(e as unknown as React.MouseEvent, "rumbleFreqStart");
+            }}>
+                <span className="text-xs text-gray-400">{rumbleFreqStart} Hz</span>
+                <div className="relative h-32 w-3 bg-gray-700 rounded overflow-hidden">
+                    <div className="absolute bottom-0 w-full bg-sky-500" style={{ height: `${(rumbleFreqStart - 10) / 90 * 100}%` }} />
+                </div>
+            </div>
+            <div className="flex flex-col items-center w-10 cursor-pointer select-none" onMouseDown={(e) => {
+                e.preventDefault();
+                const move = (e: MouseEvent) => handleDrag(e as unknown as React.MouseEvent, "rumbleFreqEnd");
+                const up = () => {
+                    window.removeEventListener('mousemove', move)
+                    window.removeEventListener('mouseup', up)
+                };
+                window.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', up);
+                handleDrag(e as unknown as React.MouseEvent, "rumbleFreqEnd");
+            }}>
+                <span className="text-xs text-gray-400">{rumbleFreqEnd} Hz</span>
+                <div className="relative h-32 w-3 bg-gray-700 rounded overflow-hidden">
+                    <div className="absolute bottom-0 w-full bg-sky-500" style={{ height: `${(rumbleFreqEnd - 10) / 90 * 100}%` }} />
+                </div>
+            </div>
+            <div className="flex flex-col items-center w-10 cursor-pointer select-none"
+                onMouseDown={(e) => {
+                    e.preventDefault()
+                    const move = (e: MouseEvent) => handleDrag(e as unknown as React.MouseEvent, "rumbleVolume")
+                    const up = () => {
+                        window.removeEventListener('mousemove', move)
+                        window.removeEventListener('mouseup', up)
+                    }
+                    window.addEventListener('mousemove', move)
+                    window.addEventListener('mouseup', up)
+                    handleDrag(e as unknown as React.MouseEvent, "rumbleVolume")
+                }}>
+                <span className="text-xs text-gray-400">{rumbleVolume}</span>
+                <div className="relative h-32 w-3 bg-gray-700 rounded overflow-hidden">
+                    <div className="absolute bottom-0 w-full bg-sky-500" style={{ height: `${rumbleVolume * 100}%` }} />
+                </div>
+            </div>
+            <div className="flex flex-col items-center w-10 cursor-pointer select-none" onMouseDown={(e) => {
+                e.preventDefault()
+                const move = (e: MouseEvent) => handleDrag(e as unknown as React.MouseEvent, "rumbleDecay")
+                const up = () => {
+                    window.removeEventListener('mousemove', move)
+                    window.removeEventListener('mouseup', up)
+                }
+                window.addEventListener('mousemove', move)
+                window.addEventListener('mouseup', up)
+                handleDrag(e as unknown as React.MouseEvent, "rumbleDecay")
+            }
+            }>
+                <span className="text-xs text-gray-400">{rumbleDecay}s</span>
+                <div className="relative h-32 w-3 bg-gray-700 rounded overflow-hidden">
+                    <div className="absolute bottom-0 w-full bg-sky-500" style={{ height: `${(rumbleDecay - 0.1) / 9.9 * 100}%` }} />
+                </div>
+            </div>
+            <div className="flex h-full items-end text-xs">
+                Hz
+            </div>
+        </div >
+    )
+}
+

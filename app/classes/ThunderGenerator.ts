@@ -5,7 +5,6 @@ export interface ThunderParams {
     duration: number;
     filterFreq: number;
     burstCount: number;
-    distance?: number;
     delayMs?: number;
     reverbDuration?: number;
     reverbDecay?: number;
@@ -14,14 +13,18 @@ export interface ThunderParams {
     panRange?: number;
     highPassFreq?: number;
     crackleAmount?: number;
-    eqGains?: number[]; // 10-band EQ
+    eqGains: number[];
+    rumbleFreqStart?: number;
+    rumbleFreqEnd?: number;
+    rumbleVolume?: number;
+    rumbleDecay?: number;
 }
 
 export class ThunderGenerator {
-    private masterVolume = 1;
     private ctx: AudioContext;
     private reverbBuffer: AudioBuffer | null = null;
     private output: GainNode;
+    private limiter: DynamicsCompressorNode;
     private params: ThunderParams;
     private eqBands: BiquadFilterNode[] = [];
     private readonly eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
@@ -41,12 +44,22 @@ export class ThunderGenerator {
             delayMs: 0,
             highPassFreq: 20,
             crackleAmount: 1,
-            eqGains: new Array(10).fill(0)
+            eqGains: new Array(10).fill(0),
+            rumbleFreqStart: 30,
+            rumbleFreqEnd: 20,
+            rumbleVolume: 0.2,
+            rumbleDecay: 8
         };
 
         this.output = this.ctx.createGain();
 
-        // Create EQ band filters
+        this.limiter = this.ctx.createDynamicsCompressor();
+        this.limiter.threshold.setValueAtTime(-6, this.ctx.currentTime);
+        this.limiter.knee.setValueAtTime(30, this.ctx.currentTime);
+        this.limiter.ratio.setValueAtTime(12, this.ctx.currentTime);
+        this.limiter.attack.setValueAtTime(0.003, this.ctx.currentTime);
+        this.limiter.release.setValueAtTime(0.25, this.ctx.currentTime);
+
         this.eqBands = this.eqFrequencies.map(freq => {
             const band = this.ctx.createBiquadFilter();
             band.type = "peaking";
@@ -56,33 +69,18 @@ export class ThunderGenerator {
             return band;
         });
 
-        // Chain EQ bands together
         let last = this.eqBands[0];
         for (let i = 1; i < this.eqBands.length; i++) {
             last.connect(this.eqBands[i]);
             last = this.eqBands[i];
         }
         last.connect(this.output);
-        this.output.connect(this.ctx.destination);
+        this.output.connect(this.limiter);
+        this.limiter.connect(this.ctx.destination);
     }
 
     setParams(newParams: Partial<ThunderParams>) {
         const updated = { ...this.params, ...newParams };
-
-        if (newParams.volume !== undefined) {
-            this.masterVolume = newParams.volume;
-        }
-
-        if (updated.distance != null) {
-            const d = updated.distance;
-            const distanceVolume = Math.max(0.2, 1 / (d * 0.3));
-            updated.delayMs = d / 0.343;
-            updated.reverbDuration = 2 + d * 0.4;
-            updated.reverbDecay = 1.5 + d * 0.3;
-            updated.subLevel = Math.max(0, 1 - d / 10);
-            updated.panRange = Math.max(0.2, 1 - d / 15);
-            updated.volume = this.masterVolume * distanceVolume;
-        }
 
         if (newParams.eqGains && newParams.eqGains.length === this.eqBands.length) {
             newParams.eqGains.forEach((gain, i) => {
@@ -103,7 +101,26 @@ export class ThunderGenerator {
 
     triggerThunder() {
         const delay = this.params.delayMs ?? 0;
+        const {
+            rumbleFreqStart = 30,
+            rumbleFreqEnd = 20,
+            rumbleVolume = 0.2,
+            rumbleDecay = 8,
+        } = this.params;
+
         setTimeout(() => {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(rumbleFreqStart, now);
+            osc.frequency.linearRampToValueAtTime(rumbleFreqEnd, now + rumbleDecay);
+            gain.gain.setValueAtTime(rumbleVolume, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + rumbleDecay);
+            osc.connect(gain).connect(this.eqBands[0]);
+            osc.start();
+            osc.stop(now + rumbleDecay);
+
             for (let i = 0; i < this.params.burstCount; i++) {
                 const burstDelay = 200 + Math.random() * 400;
                 setTimeout(() => this._playSingleBurst(
@@ -116,10 +133,10 @@ export class ThunderGenerator {
 
     private _playSingleBurst(duration: number, volume: number) {
         const now = this.ctx.currentTime;
-
         const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * duration, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         const crackle = this.params.crackleAmount ?? 1;
+
         for (let i = 0; i < data.length; i++) {
             const buildUp = Math.min(1, i / (this.ctx.sampleRate * (duration * 0.25)));
             const decay = Math.exp(-i / (this.ctx.sampleRate * duration));
@@ -140,8 +157,8 @@ export class ThunderGenerator {
         highpass.frequency.value = this.params.highPassFreq ?? 10;
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.exponentialRampToValueAtTime(volume * 0.8, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(volume * 0.8, now + 0.05);
         gain.gain.exponentialRampToValueAtTime(volume * 0.5, now + duration * 0.9);
         gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 3);
 
@@ -150,10 +167,7 @@ export class ThunderGenerator {
         pan.pan.setValueAtTime(basePan, now);
         pan.pan.linearRampToValueAtTime(-basePan, now + duration);
 
-        noise.connect(lowpass).connect(highpass).connect(gain).connect(pan);
-
-        // Connect to EQ chain
-        pan.connect(this.eqBands[0]);
+        noise.connect(lowpass).connect(highpass).connect(gain).connect(pan).connect(this.eqBands[0]);
 
         if (this.reverbBuffer) {
             const convolver = this.ctx.createConvolver();
@@ -202,12 +216,16 @@ export class ThunderGenerator {
         brownLowpass.frequency.value = 1500;
 
         const brownGain = this.ctx.createGain();
-        brownGain.gain.setValueAtTime(volume * 0.4, now);
+        brownGain.gain.setValueAtTime(volume * 0.6, now);
         brownGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 2.5);
 
         brown.connect(brownHighPass).connect(brownLowpass).connect(brownGain).connect(this.eqBands[0]);
 
         noise.start();
         brown.start();
+    }
+
+    public connect(node: AudioNode) {
+        this.output.connect(node);
     }
 }
