@@ -91,31 +91,38 @@ export default function RainSynth() {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold text-center">🌧️ Rain Synth</h2>
+    <div
+      className="bg-gradient-to-br from-[#1a1a1a] via-[#2c2c2c] to-[#1a1a1a] rounded-2xl shadow-[0_0_20px_#00faff40] border border-[#00faff40] text-white font-mono divide-y"
+      style={{ maxWidth: 1200, margin: '0 auto' }}
+    >
+      <h2 className="text-2xl font-bold text-center text-[#00faff] tracking-wide drop-shadow-[0_0_4px_#00faff] p-4">
+        Rain Synth
+      </h2>
 
-      <div className="flex flex-wrap gap-4">
-        <div className='flex flex-col items-center w-fit'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6 divide-x'>
+        <div className="w-full flex flex-col gap-8 p-4">
+          <h1>Master Controls</h1>
           <Slider
-            label={labels.volume}
+            label={<span className="text-[#0ff] drop-shadow">{labels.volume}</span>}
             value={params.volume}
             onChange={(value) => updateParam('volume', value)}
             min={0}
             max={1}
             step={0.01}
-            wrapperDirection='row'
+            wrapperDirection='column'
           />
           <Equalizer gains={params.eqGains} freqs={eqFrequencies} onChange={updateEQBand} />
         </div>
 
-        <SynthSection label="Noise Controls">
-          <div className='flex flex-wrap justify-around w-fit gap-8'>
-            <div className="flex flex-col items-center gap-2">
-              <label>Noise Type</label>
+        <div className="w-full flex flex-col gap-8 p-4">
+          <h1>Noise Controls</h1>
+          <div className="flex flex-wrap justify-center gap-8 text-[#ff0]">
+            <div className="flex flex-col w-32 items-center gap-2">
+              <label className="text-[#ccc] text-sm">Noise Type</label>
               <select
                 value={params.noiseType}
                 onChange={(e) => updateParam('noiseType', e.target.value as NoiseType)}
-                className="bg-gray-800 text-white border border-gray-600 rounded p-2"
+                className="w-full bg-[#111] text-[#0ff] border border-[#555] rounded p-2 shadow-inner hover:shadow-[0_0_5px_#00faff] transition"
               >
                 <option value="pink">Pink</option>
                 <option value="white">White</option>
@@ -123,7 +130,7 @@ export default function RainSynth() {
             </div>
 
             <Knob
-              label={labels.noiseLevel}
+              label={<span className="text-[#0ff]">{labels.noiseLevel}</span>}
               value={params.noiseLevel}
               onChange={(value) => updateParam('noiseLevel', value)}
               min={0}
@@ -131,7 +138,7 @@ export default function RainSynth() {
               step={0.01}
             />
             <Knob
-              label={labels.noiseFilterFreq}
+              label={<span className="text-[#0ff]">{labels.noiseFilterFreq}</span>}
               value={params.noiseFilterFreq}
               onChange={(value) => updateParam('noiseFilterFreq', value)}
               min={20}
@@ -139,85 +146,35 @@ export default function RainSynth() {
               step={10}
             />
           </div>
-        </SynthSection>
+        </div>
       </div>
 
-      <SynthSection label="Drop Controls">
-        <div className='flex flex-wrap justify-around w-fit gap-8'>
-          <Knob
-            label={labels.dropDryLevel}
-            value={params.dropDryLevel}
-            onChange={(value) => updateParam('dropDryLevel', value)}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <Knob
-            label={labels.dropWetLevel}
-            value={params.dropWetLevel}
-            onChange={(value) => updateParam('dropWetLevel', value)}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <Knob
-            label={labels.dropReverbLevel}
-            value={params.dropReverbLevel}
-            onChange={(value) => updateParam('dropReverbLevel', value)}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <Knob
-            label={labels.dropPanRange}
-            value={params.dropPanRange}
-            onChange={(value) => updateParam('dropPanRange', value)}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <Knob
-            label={labels.dropQ}
-            value={params.dropQ}
-            onChange={(value) => updateParam('dropQ', value)}
-            min={0.1}
-            max={5}
-            step={0.1}
-          />
-          <Knob
-            label={labels.dropRate}
-            value={params.dropRate}
-            onChange={(value) => updateParam('dropRate', value)}
-            min={0.1}
-            max={100}
-            step={0.1}
-          />
-          <Knob
-            label={labels.dropMinPitch}
-            value={params.dropMinPitch}
-            onChange={(value) => updateParam('dropMinPitch', value)}
-            min={100}
-            max={4000}
-            step={1}
-          />
-          <Knob
-            label={labels.dropMaxPitch}
-            value={params.dropMaxPitch}
-            onChange={(value) => updateParam('dropMaxPitch', value)}
-            min={100}
-            max={4000}
-            step={1}
-          />
-          <Knob
-            label={labels.dropDecayTime}
-            value={params.dropDecayTime}
-            onChange={(value) => updateParam('dropDecayTime', value)}
-            min={0.005}
-            max={1}
-            step={0.001}
-          />
+      <div className='w-full flex flex-col gap-8 p-4'>
+        <h1>Drop Controls</h1>
+        <div className="grid grid-cols-4 justify-center gap-6">
+          {([
+            'dropDryLevel',
+            'dropWetLevel',
+            'dropReverbLevel',
+            'dropPanRange',
+            'dropQ',
+            'dropRate',
+            'dropMinPitch',
+            'dropMaxPitch',
+            'dropDecayTime',
+          ] as (keyof RainParams)[]).map((key) => (
+            <Knob
+              key={key}
+              label={<span className="text-[#0ff] drop-shadow-sm">{labels[key]}</span>}
+              value={params[key] as number}
+              onChange={(value) => updateParam(key, value)}
+              min={key.includes('Pitch') ? 100 : key === 'dropDecayTime' ? 0.005 : 0}
+              max={key.includes('Pitch') ? 4000 : key === 'dropDecayTime' ? 1 : key === 'dropRate' ? 100 : key === 'dropQ' ? 5 : 1}
+              step={key.includes('Pitch') ? 1 : key === 'dropQ' ? 0.1 : key === 'dropDecayTime' ? 0.001 : 0.01}
+            />
+          ))}
         </div>
-      </SynthSection>
+      </div>
     </div>
   );
 }

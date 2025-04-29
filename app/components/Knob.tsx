@@ -86,12 +86,12 @@ export const Knob: FC<KnobProps> = ({
                 ref={knobRef}
                 onMouseDown={() => {
                     setIsDragging(true);
-                    lastAngleRef.current = valueToAngle(value); // init from current value
+                    lastAngleRef.current = valueToAngle(value);
                 }}
-                className="relative w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-600 cursor-pointer"
+                className="relative w-16 h-16 rounded-full border-2 border-[#00faff] bg-[#111] shadow-[inset_0_0_10px_#00faff44,0_0_6px_#00faff66] transition-transform hover:scale-105 cursor-pointer"
             >
                 <div
-                    className="absolute left-1/2 top-1/2 w-[2px] h-6 bg-green-400 origin-bottom"
+                    className="absolute left-1/2 top-1/2 w-[2px] h-6 bg-[#0ff] origin-bottom"
                     style={{
                         transform: `translate(-50%, -100%) rotate(${rotation}deg)`
                     }}

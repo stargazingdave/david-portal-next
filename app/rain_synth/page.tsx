@@ -1,7 +1,9 @@
 import RainSynth from "../components/RainSynth";
 
 const RainGeneratorPage = () => {
-    return <RainSynth />
+    return <div className="flex flex-col items-center justify-center h-full p-4">
+        <RainSynth />
+    </div>;
 }
 
 export default RainGeneratorPage;

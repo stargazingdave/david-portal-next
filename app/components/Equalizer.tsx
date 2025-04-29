@@ -35,9 +35,9 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
     ]
 
     return (
-        <div className="flex gap-2 p-4 rounded-xl shadow-xl h-50 w-fit">
+        <div className="flex p-4 rounded-xl shadow-xl h-50 w-full">
             {/* Ruler */}
-            <div className="h-full flex flex-col justify-between items-end pr-1 text-xs text-gray-500 gap-2">
+            <div className="h-full flex flex-col justify-between items-end pr-1 text-xs text-gray-500 text-nowrap gap-2">
                 <div className="h-full flex flex-col justify-between items-end pr-1 text-xs text-gray-500">
                     {ticks.map((val) => (
                         <div key={val} className="h-fit leading-none">
@@ -52,7 +52,7 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
             </div>
 
             {/* Bars */}
-            <div ref={containerRef} className="flex gap-2 justify-center items-end h-full">
+            <div ref={containerRef} className="flex justify-between items-end h-full w-full text-nowrap">
                 {gains.map((gain, i) => {
                     const percent = (gain - min) / (max - min)
                     return (
@@ -71,7 +71,7 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
                                 handleDrag(e as unknown as React.MouseEvent, i)
                             }}
                         >
-                            <div className="relative h-full w-3 bg-gray-700 rounded overflow-hidden">
+                            <div className="relative h-full w-8 bg-gray-700 rounded overflow-hidden">
                                 <div
                                     className="absolute bottom-0 w-full bg-sky-500"
                                     style={{ height: `${percent * 100}%` }}

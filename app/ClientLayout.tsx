@@ -1,5 +1,6 @@
 'use client';
 
+import { Footer } from "./components/Footer";
 import { Navbar } from "./components/Navbar";
 import { Sidebar } from "./components/Sidebar";
 import { useState } from "react";
@@ -39,9 +40,7 @@ export default function ClientLayout({
             <main className="h-fit flex flex-col grow w-full">
               {children}
             </main>
-            <footer className="h-fit flex gap-4 flex-wrap items-center justify-center">
-              Built with 💙 by David Portal • {new Date().getFullYear()}
-            </footer>
+            <Footer />
           </div>
         </div>
       </div>

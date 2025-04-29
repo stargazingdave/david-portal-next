@@ -29,10 +29,11 @@ export const Slider: FC<SliderProps> = ({
                 step={step || ((max - min) / 100)}
                 value={value}
                 onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[#111] shadow-inner"
                 style={{
-                    accentColor: "#4caf50",
-                    background: `linear-gradient(to right, #4caf50 ${((value - min) / (max - min)) * 100}%, #ddd ${((value - min) / (max - min)) * 100}%)`,
+                    accentColor: '#00faff',
+                    background: `linear-gradient(to right, #00faff ${((value - min) / (max - min)) * 100}%, #333 ${((value - min) / (max - min)) * 100}%)`,
+                    boxShadow: 'inset 0 0 6px #00faff66',
                 }}
             />
         </div>
