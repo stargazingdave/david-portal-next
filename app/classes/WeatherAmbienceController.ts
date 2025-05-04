@@ -1,12 +1,13 @@
-import { NoiseType, RainGenerator } from "../classes/RainGenerator";
-import { ThunderGenerator, ThunderParams } from "../classes/ThunderGenerator";
+import { RainGenerator, RainParams, NoiseType } from "./RainGenerator";
+import { ThunderGenerator, ThunderParams } from "./ThunderGenerator";
 
-export interface Range<T = number> {
+export type Range<T = number> = {
     min: T;
     max: T;
-}
+};
 
 export interface AmbientSettings {
+    masterVolume: number;
     rainIntensity: Range;
     rainDropRate: Range;
     rainMinPitch: Range;
@@ -18,94 +19,129 @@ export interface AmbientSettings {
     rainPanRange: Range;
     rainDropQ: Range;
     rainNoiseType: NoiseType;
-    thunderParams: { [K in keyof ThunderParams]?: Range<number> };
-    thunderDelay: Range; // ms
-    masterVolume: number;
+    thunderDelay: Range<number>;
     eqGains: number[];
+    thunderParams: Partial<{ [K in keyof ThunderParams]: Range<number> }>;
 }
-
-
-
 
 export class WeatherAmbienceController {
     private ctx: AudioContext;
     private rain: RainGenerator;
     private thunder: ThunderGenerator;
-    private output: GainNode;
+    private masterGain: GainNode;
     private settings: AmbientSettings;
-    private thunderTimeout: ReturnType<typeof setTimeout> | null = null;
-    private running = false;
+    private thunderTimeout: any = null;
 
-    constructor(audioCtx: AudioContext, settings: AmbientSettings) {
-        this.ctx = audioCtx;
-        this.settings = settings;
-        this.output = audioCtx.createGain();
-        this.output.gain.value = settings.masterVolume;
-        this.rain = new RainGenerator(audioCtx);
-        this.thunder = new ThunderGenerator(audioCtx);
-        this.rain.connect(this.output);
-        this.thunder.connect(this.output);
-        this.output.connect(this.ctx.destination);
+    constructor(ctx: AudioContext, settings: AmbientSettings) {
+        this.ctx = ctx;
+        this.settings = structuredClone(settings);
+
+        this.masterGain = ctx.createGain();
+        this.masterGain.gain.value = settings.masterVolume;
+        this.masterGain.connect(ctx.destination);
+
+        this.rain = new RainGenerator(ctx);
+        this.rain.connect(this.masterGain);
+
+        this.thunder = new ThunderGenerator(ctx);
+        this.thunder.connect(this.masterGain);
+
+        this.applySettings();
     }
 
-    private randomInRange({ min, max }: Range<number>): number {
-        return min + Math.random() * (max - min);
-    }
-
-    private scheduleThunder() {
-        if (!this.running) return;
-        const thunderSettings: Partial<ThunderParams> = { eqGains: this.settings.eqGains };
-        for (const key in this.settings.thunderParams) {
-            const range = this.settings.thunderParams[key as keyof ThunderParams];
-            if (range && typeof (range as Range<any>).min === 'number') {
-                (thunderSettings as any)[key] = this.randomInRange(range as Range<number>);
-            }
-        }
-        this.thunder.setParams(thunderSettings);
-        this.thunder.setGeneratedReverb();
-        this.thunder.triggerThunder();
-
-        const delay = this.randomInRange(this.settings.thunderDelay);
-        this.thunderTimeout = setTimeout(() => this.scheduleThunder(), delay);
-    }
-
-    start() {
-        if (this.running) return;
-        this.running = true;
-        // this.rain.setIntensity(this.randomInRange(this.settings.rainIntensity));
-        this.rain.setVolume(this.randomInRange(this.settings.rainDropRate));
+    public start() {
         this.rain.start();
         this.scheduleThunder();
     }
 
-    stop() {
-        this.running = false;
+    public stop() {
         this.rain.stop();
         if (this.thunderTimeout) clearTimeout(this.thunderTimeout);
     }
 
-    setMasterVolume(vol: number) {
-        this.settings.masterVolume = vol;
-        this.output.gain.value = vol;
+    public setMasterVolume(value: number) {
+        this.masterGain.gain.value = value;
     }
 
-    updateSettings(newSettings: Partial<AmbientSettings>) {
-        this.settings = {
-            ...this.settings,
-            ...newSettings,
-        };
-    }
-
-    updateEqGains(gains: number[]) {
+    public updateEqGains(gains: number[]) {
         this.settings.eqGains = gains;
         this.thunder.setParams({ eqGains: gains });
     }
 
-    connect(node: AudioNode) {
-        this.output.connect(node);
+    public updateSettings(settings: AmbientSettings) {
+        this.settings = structuredClone(settings);
+        this.applySettings();
     }
 
-    disconnect() {
-        this.output.disconnect();
+    private applySettings() {
+        const s = this.settings;
+
+        const rainParams: Partial<RainParams> = {
+            volume: (s.rainIntensity.min + s.rainIntensity.max) / 2,
+            noiseType: s.rainNoiseType,
+            noiseLevel: (s.rainIntensity.min + s.rainIntensity.max) / 2,
+            noiseFilterFreq: 4000,
+            eqGains: s.eqGains,
+            dropRate: this.avg(s.rainDropRate),
+            dropMinPitch: this.avg(s.rainMinPitch),
+            dropMaxPitch: this.avg(s.rainMaxPitch),
+            dropDecayTime: this.avg(s.rainDecayTime),
+            dropDryLevel: this.avg(s.rainDropDryLevel),
+            dropWetLevel: this.avg(s.rainWetLevel),
+            dropPanRange: this.avg(s.rainPanRange),
+            dropQ: this.avg(s.rainDropQ),
+        };
+
+        this.rain.setNoiseType(rainParams.noiseType!);
+        this.rain.setVolume(rainParams.volume!);
+        this.rain.setNoiseLevel(rainParams.noiseLevel!);
+        this.rain.setNoiseFilterFreq(rainParams.noiseFilterFreq!);
+        this.rain.setEQGains(rainParams.eqGains!);
+        this.rain.setDropRate(rainParams.dropRate!);
+        this.rain.setPitchRange(rainParams.dropMinPitch!, rainParams.dropMaxPitch!);
+        this.rain.setDecayTime(rainParams.dropDecayTime!);
+        this.rain.setDropDryLevel(rainParams.dropDryLevel!);
+        this.rain.setDropWetLevel(rainParams.dropWetLevel!);
+        this.rain.setPanRange(rainParams.dropPanRange!);
+        this.rain.setDropQ(rainParams.dropQ!);
+
+        this.thunder.setParams({ eqGains: s.eqGains });
+
+        this.setMasterVolume(s.masterVolume);
+    }
+
+    private scheduleThunder() {
+        const delay = this.rand(this.settings.thunderDelay);
+        this.thunderTimeout = setTimeout(() => {
+            const thunderParams = this.getThunderParams();
+            this.thunder.setParams(thunderParams);
+            this.thunder.setGeneratedReverb();
+            this.thunder.triggerThunder();
+            this.scheduleThunder();
+        }, delay);
+    }
+
+    private getThunderParams(): ThunderParams {
+        const p: Partial<ThunderParams> = {};
+        const keys = Object.keys(this.settings.thunderParams) as (keyof ThunderParams)[];
+
+        for (const key of keys) {
+            const range = this.settings.thunderParams[key];
+            if (range) {
+                const value = this.rand(range);
+                (p[key] as number | number[]) = value;
+            }
+        }
+
+        p.eqGains = this.settings.eqGains;
+        return p as ThunderParams;
+    }
+
+    private rand(range: Range<number>): number {
+        return range.min + Math.random() * (range.max - range.min);
+    }
+
+    private avg(range: Range<number>): number {
+        return (range.min + range.max) / 2;
     }
 }

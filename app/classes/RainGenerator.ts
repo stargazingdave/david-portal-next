@@ -90,7 +90,7 @@ export class RainGenerator {
 
         this._connectNodes();
         this._generateImpulseResponse();
-        this._applyParams();
+        this._applyParams(); // safe: no noiseType applied here now
     }
 
     private _connectNodes() {
@@ -119,7 +119,6 @@ export class RainGenerator {
 
     private _applyParams() {
         this.setVolume(this.params.volume);
-        this.setNoiseType(this.params.noiseType);
         this.setNoiseFilterFreq(this.params.noiseFilterFreq);
         this.setNoiseLevel(this.params.noiseLevel);
         this.setDropDryLevel(this.params.dropDryLevel);
@@ -133,17 +132,13 @@ export class RainGenerator {
         this.setEQGains(this.params.eqGains);
     }
 
-    public setEQGains(gains: number[]) {
-        this.params.eqGains = gains;
-        gains.forEach((gain, i) => {
-            if (this.eqBands[i]) this.eqBands[i].gain.value = gain;
-        });
-    }
-
-    public start() {
+    public async start() {
         if (this.running) return;
+        if (this.audioCtx.state === 'suspended') {
+            await this.audioCtx.resume();
+        }
         this.running = true;
-        this._startNoise();
+        this.setNoiseType(this.params.noiseType); // now safe to run
         this._startDrops();
     }
 
@@ -151,6 +146,13 @@ export class RainGenerator {
         this.running = false;
         if (this.noiseNode) this.noiseNode.stop();
         if (this.dropInterval) clearInterval(this.dropInterval);
+    }
+
+    public setEQGains(gains: number[]) {
+        this.params.eqGains = gains;
+        gains.forEach((gain, i) => {
+            if (this.eqBands[i]) this.eqBands[i].gain.value = gain;
+        });
     }
 
     public setVolume(value: number) {
@@ -182,7 +184,9 @@ export class RainGenerator {
 
     public setNoiseType(type: NoiseType) {
         this.params.noiseType = type;
-        this._startNoise();
+        if (this.running) {
+            this._startNoise();
+        }
     }
 
     public setNoiseFilterFreq(value: number) {

@@ -45,6 +45,7 @@ const eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
 export default function RainSynth() {
   const [params, setParams] = useState<RainParams>(defaultParams);
+  const [isPlaying, setIsPlaying] = useState(false);
   const ctxRef = useRef<AudioContext | null>(null);
   const rainRef = useRef<RainGenerator | null>(null);
 
@@ -52,13 +53,32 @@ export default function RainSynth() {
     const ctx = new AudioContext();
     const rain = new RainGenerator(ctx, defaultParams);
     rain.connect(ctx.destination);
-    rain.start();
 
     rainRef.current = rain;
     ctxRef.current = ctx;
 
-    return () => rain.stop();
+    return () => {
+      rain.stop();
+      ctx.close();
+    };
   }, []);
+
+  const togglePlay = async () => {
+    const rain = rainRef.current;
+    const ctx = ctxRef.current;
+    if (!rain || !ctx) return;
+
+    if (ctx.state === 'suspended') {
+      await ctx.resume(); // Ensure audio starts correctly
+    }
+
+    if (!isPlaying) {
+      rain.start();
+    } else {
+      rain.stop();
+    }
+    setIsPlaying(!isPlaying);
+  };
 
   const updateParam = (key: keyof RainParams, value: any) => {
     const newParams = { ...params, [key]: value };
@@ -98,6 +118,15 @@ export default function RainSynth() {
       <h2 className="text-2xl font-bold text-center text-[#00faff] tracking-wide drop-shadow-[0_0_4px_#00faff] p-4">
         Rain Synth
       </h2>
+
+      <div className='flex justify-center p-4'>
+        <button
+          className="px-6 py-2 bg-[#00faff] text-black rounded-xl font-bold shadow hover:shadow-lg transition"
+          onClick={togglePlay}
+        >
+          {isPlaying ? 'Stop' : 'Start'}
+        </button>
+      </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6 divide-x'>
         <div className="w-full flex flex-col gap-8 p-4">
