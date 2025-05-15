@@ -1,27 +1,63 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { RainGenerator, NoiseType, RainParams } from '../classes/RainGenerator';
-import { Equalizer } from '../components/Equalizer';
-import { Slider } from './Slider';
-import { SynthSection } from './SynthSection';
-import { Knob } from './Knob';
+import { RainGenerator, NoiseType, RainParams } from '../../classes/RainGenerator';
+import { Slider } from '../Slider';
+import { SynthSection } from '../SynthSection';
+import { Knob } from './components/Knob';
+import { OscParamController } from './components/OscParamController';
+import { Equalizer } from './components/Equalizer';
 
 const defaultParams: RainParams = {
   volume: 0.5,
   eqGains: new Array(10).fill(0),
   noiseLevel: 0.2,
   noiseType: 'pink',
-  noiseFilterFreq: 4000,
+  noiseFilterFreq: {
+    value: 4000,
+    osc: false,
+    amp: 0.5,
+    freq: 0.1,
+  },
   dropDryLevel: 0.2,
   dropWetLevel: 0.4,
-  dropRate: 10,
-  dropMinPitch: 300,
-  dropMaxPitch: 800,
-  dropDecayTime: 0.2,
-  dropReverbLevel: 0.4,
-  dropPanRange: 1.0,
-  dropQ: 10,
+  dropRate: {
+    value: 10,
+    osc: false,
+    amp: 0.5,
+    freq: 0.1,
+  },
+  dropMinPitch: {
+    value: 300,
+    osc: false,
+    amp: 500,
+    freq: 0.1,
+  },
+  dropMaxPitch: {
+    value: 800,
+    osc: false,
+    amp: 500,
+    freq: 0.1,
+  },
+  dropDecayTime: {
+    value: 0.2,
+    osc: false,
+    amp: 0.5,
+    freq: 0.1,
+  },
+  dropReverbLevel: {
+    value: 0.4,
+    osc: false,
+    amp: 0.5,
+    freq: 0.1,
+  },
+  dropPanRange: {
+    value: 1.0,
+    osc: false,
+    amp: 0.5,
+    freq: 0.1,
+  },
+  dropQ: 5,
 };
 
 const labels: Record<keyof RainParams, string> = {
@@ -101,7 +137,7 @@ export default function RainSynth() {
     if (key === 'dropRate') rain.setDropRate(value);
     if (key === 'dropReverbLevel') rain.setDropReverbLevel(value);
     if (key === 'noiseFilterFreq') rain.setNoiseFilterFreq(value);
-    if (key === 'eqGains') rain.setEQGains(value);
+    if (key === 'eqGains') rain.setParams({ eqGains: value });
   };
 
   const updateEQBand = (index: number, value: number) => {
@@ -166,12 +202,11 @@ export default function RainSynth() {
               max={1}
               step={0.01}
             />
-            <Knob
-              label={<span className="text-[#0ff]">{labels.noiseFilterFreq}</span>}
-              value={params.noiseFilterFreq}
-              onChange={(value) => updateParam('noiseFilterFreq', value)}
-              min={20}
-              max={8000}
+            <OscParamController
+              label="Noise Filter Freq"
+              param={params.noiseFilterFreq}
+              onChange={(p) => updateParam('noiseFilterFreq', p)}
+              valueRange={[20, 8000]}
               step={10}
             />
           </div>
@@ -181,27 +216,75 @@ export default function RainSynth() {
       <div className='w-full flex flex-col gap-8 p-4'>
         <h1>Drop Controls</h1>
         <div className="grid grid-cols-4 justify-center gap-6">
-          {([
-            'dropDryLevel',
-            'dropWetLevel',
-            'dropReverbLevel',
-            'dropPanRange',
-            'dropQ',
-            'dropRate',
-            'dropMinPitch',
-            'dropMaxPitch',
-            'dropDecayTime',
-          ] as (keyof RainParams)[]).map((key) => (
-            <Knob
-              key={key}
-              label={<span className="text-[#0ff] drop-shadow-sm">{labels[key]}</span>}
-              value={params[key] as number}
-              onChange={(value) => updateParam(key, value)}
-              min={key.includes('Pitch') ? 100 : key === 'dropDecayTime' ? 0.005 : 0}
-              max={key.includes('Pitch') ? 4000 : key === 'dropDecayTime' ? 1 : key === 'dropRate' ? 100 : key === 'dropQ' ? 5 : 1}
-              step={key.includes('Pitch') ? 1 : key === 'dropQ' ? 0.1 : key === 'dropDecayTime' ? 0.001 : 0.01}
-            />
-          ))}
+          <Knob
+            label={<span className="text-[#0ff] drop-shadow-sm">Drop Dry Level</span>}
+            value={params.dropDryLevel}
+            onChange={(value) => updateParam('dropDryLevel', value)}
+            min={0}
+            max={1}
+            step={0.01}
+          />
+          <Knob
+            label={<span className="text-[#0ff] drop-shadow-sm">Drop Wet Level</span>}
+            value={params.dropWetLevel}
+            onChange={(value) => updateParam('dropWetLevel', value)}
+            min={0}
+            max={1}
+            step={0.01}
+          />
+          <OscParamController
+            label="Drop Reverb Level"
+            param={params.dropReverbLevel}
+            onChange={(p) => updateParam('dropReverbLevel', p)}
+            valueRange={[0, 5]}
+            step={0.1}
+          />
+          <OscParamController
+            label="Drop Pan Range"
+            param={params.dropPanRange}
+            onChange={(p) => updateParam('dropPanRange', p)}
+            valueRange={[20, 8000]}
+            step={10}
+          />
+          <Knob
+            label={<span className="text-[#0ff] drop-shadow-sm">Drop Q</span>}
+            value={params.dropQ}
+            onChange={(value) => updateParam('dropQ', value)}
+            min={0}
+            max={5}
+            step={0.1}
+          />
+          <OscParamController
+            label="Drop Rate"
+            param={params.dropRate}
+            onChange={(p) => updateParam('dropRate', p)}
+            valueRange={[20, 8000]}
+            ampRange={[0, 1000]}
+            step={10}
+          />
+          <OscParamController
+            label="Drop Min Pitch"
+            param={params.dropMinPitch}
+            onChange={(p) => updateParam('dropMinPitch', p)}
+            valueRange={[20, 8000]}
+            ampRange={[0, 1000]}
+            step={10}
+          />
+          <OscParamController
+            label="Drop Max Pitch"
+            param={params.dropMaxPitch}
+            onChange={(p) => updateParam('dropMaxPitch', p)}
+            valueRange={[20, 8000]}
+            ampRange={[0, 1000]}
+            step={10}
+          />
+          <OscParamController
+            label="Drop Decay Time"
+            param={params.dropDecayTime}
+            onChange={(p) => updateParam('dropDecayTime', p)}
+            valueRange={[0.005, 1]}
+            step={0.001}
+          />
         </div>
       </div>
     </div>

@@ -1,29 +1,10 @@
 'use client';
 
 import React, { FC, useEffect, useRef, useState } from "react";
-import { ThunderParams, ThunderGenerator } from "../classes/ThunderGenerator";
-import { Equalizer } from "./Equalizer";
-import { Knob } from "./Knob";
+import { ThunderParams, ThunderGenerator, _defaultThunderParams } from "../../classes/ThunderGenerator";
+import { Equalizer } from "./components/Equalizer";
+import { Knob } from "./components/Knob";
 
-const defaultParams: ThunderParams = {
-    volume: 1,
-    duration: 2,
-    filterFreq: 750,
-    burstCount: 3,
-    delayMs: 0,
-    reverbDuration: 2,
-    reverbDecay: 2,
-    reverbWetLevel: 0.4,
-    subLevel: 0.1,
-    panRange: 1,
-    highPassFreq: 20,
-    crackleAmount: 1,
-    eqGains: new Array(10).fill(0),
-    rumbleFreqStart: 30,
-    rumbleFreqEnd: 20,
-    rumbleVolume: 0.2,
-    rumbleDecay: 8,
-};
 
 const labels: Record<keyof ThunderParams, string> = {
     volume: 'Volume',
@@ -48,7 +29,7 @@ const labels: Record<keyof ThunderParams, string> = {
 const eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
 export default function ThunderSynth() {
-    const [params, setParams] = useState<ThunderParams>(defaultParams);
+    const [params, setParams] = useState<ThunderParams>(_defaultThunderParams);
     const thunderRef = useRef<ThunderGenerator | null>(null);
 
     useEffect(() => {

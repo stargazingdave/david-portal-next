@@ -1,3 +1,5 @@
+import { OscParam } from "../components/noised/types/OscParam";
+
 export type NoiseType = 'pink' | 'white';
 
 export interface RainParams {
@@ -6,21 +8,38 @@ export interface RainParams {
 
     noiseLevel: number;
     noiseType: NoiseType;
-    noiseFilterFreq: number;
+    noiseFilterFreq: OscParam;
 
     dropDryLevel: number;
     dropWetLevel: number;
-    dropRate: number;
-    dropMinPitch: number;
-    dropMaxPitch: number;
-    dropDecayTime: number;
-    dropReverbLevel: number;
-    dropPanRange: number;
+    dropRate: OscParam;
+    dropMinPitch: OscParam;
+    dropMaxPitch: OscParam;
+    dropDecayTime: OscParam;
+    dropReverbLevel: OscParam;
+    dropPanRange: OscParam;
     dropQ: number;
 }
 
-export class RainGenerator {
-    private audioCtx: AudioContext;
+export const _defaultRainParams: RainParams = {
+    volume: 0.5,
+    noiseLevel: 0.2,
+    noiseType: 'pink',
+    noiseFilterFreq: { value: 4000, osc: false, amp: 1000, freq: 0.1 },
+    eqGains: new Array(10).fill(0),
+    dropDryLevel: 0.2,
+    dropWetLevel: 0.4,
+    dropRate: { value: 10, osc: false, amp: 5, freq: 0.1 },
+    dropMinPitch: { value: 300, osc: false, amp: 100, freq: 0.1 },
+    dropMaxPitch: { value: 800, osc: false, amp: 500, freq: 0.1 },
+    dropDecayTime: { value: 0.2, osc: false, amp: 0.1, freq: 0.1 },
+    dropReverbLevel: { value: 0.4, osc: false, amp: 0.2, freq: 0.1 },
+    dropPanRange: { value: 1.0, osc: false, amp: 0.5, freq: 0.1 },
+    dropQ: 10,
+};
+
+export class RainGenerator<T extends BaseAudioContext = AudioContext> {
+    private audioCtx: T;
     private output: GainNode;
     private noiseGainNode: GainNode;
     private dropGainNode: GainNode;
@@ -34,9 +53,10 @@ export class RainGenerator {
     private running: boolean;
     private params: RainParams;
     private eqBands: BiquadFilterNode[];
+    private lfoMap: Map<string, { osc: OscillatorNode; gain: GainNode }>;
     private readonly eqFrequencies = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
-    constructor(audioCtx: AudioContext, params?: Partial<RainParams>) {
+    constructor(audioCtx: T, params?: Partial<RainParams>) {
         this.audioCtx = audioCtx;
         this.output = this.audioCtx.createGain();
         this.noiseGainNode = this.audioCtx.createGain();
@@ -51,26 +71,9 @@ export class RainGenerator {
         this.noiseNode = null;
         this.dropInterval = null;
         this.running = false;
+        this.lfoMap = new Map();
 
-        const defaultParams: RainParams = {
-            volume: 0.5,
-            noiseLevel: 0.2,
-            noiseType: 'pink',
-            noiseFilterFreq: 4000,
-            eqGains: new Array(10).fill(0),
-            dropDryLevel: 0.2,
-            dropWetLevel: 0.4,
-            dropRate: 10,
-            dropMinPitch: 300,
-            dropMaxPitch: 800,
-            dropDecayTime: 0.2,
-            dropReverbLevel: 0.4,
-            dropPanRange: 1.0,
-            dropQ: 10,
-        };
-
-        this.params = { ...defaultParams, ...params };
-        this.noiseFilter.frequency.value = this.params.noiseFilterFreq;
+        this.params = { ..._defaultRainParams, ...params };
 
         this.eqBands = this.eqFrequencies.map(freq => {
             const band = this.audioCtx.createBiquadFilter();
@@ -90,7 +93,6 @@ export class RainGenerator {
 
         this._connectNodes();
         this._generateImpulseResponse();
-        this._applyParams(); // safe: no noiseType applied here now
     }
 
     private _connectNodes() {
@@ -117,46 +119,124 @@ export class RainGenerator {
         this.reverbNode.buffer = impulse;
     }
 
-    private _applyParams() {
-        this.setVolume(this.params.volume);
-        this.setNoiseFilterFreq(this.params.noiseFilterFreq);
-        this.setNoiseLevel(this.params.noiseLevel);
-        this.setDropDryLevel(this.params.dropDryLevel);
-        this.setDropWetLevel(this.params.dropWetLevel);
-        this.setDropRate(this.params.dropRate);
-        this.setPanRange(this.params.dropPanRange);
-        this.setDropQ(this.params.dropQ);
-        this.setPitchRange(this.params.dropMinPitch, this.params.dropMaxPitch);
-        this.setDecayTime(this.params.dropDecayTime);
-        this.setDropReverbLevel(this.params.dropReverbLevel);
-        this.setEQGains(this.params.eqGains);
+    private setOscParam(param: OscParam, target: AudioParam, id: string) {
+        const now = this.audioCtx.currentTime;
+
+        const prev = this.lfoMap.get(id);
+        if (prev) {
+            prev.osc.stop();
+            prev.osc.disconnect();
+            prev.gain.disconnect();
+            this.lfoMap.delete(id);
+        }
+
+        target.cancelScheduledValues(now);
+        target.setValueAtTime(param.value, now);
+
+        if (this.running && param.osc) {
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = param.freq;
+            gain.gain.value = param.amp;
+
+            osc.connect(gain);
+            gain.connect(target);
+            osc.start();
+
+            this.lfoMap.set(id, { osc, gain });
+        }
     }
 
     public async start() {
         if (this.running) return;
-        if (this.audioCtx.state === 'suspended') {
+
+        if (this.audioCtx instanceof AudioContext && this.audioCtx.state === 'suspended') {
             await this.audioCtx.resume();
         }
+
         this.running = true;
-        this.setNoiseType(this.params.noiseType); // now safe to run
+        const now = this.audioCtx.currentTime;
+
+        // Set gain levels
+        this.output.gain.setValueAtTime(this.params.volume, now);
+        this.noiseGainNode.gain.setValueAtTime(this.params.volume * 0.4, now);
+        this.dropGainNode.gain.setValueAtTime(this.params.dropWetLevel, now);
+        this.dryDropGainNode.gain.setValueAtTime(this.params.dropDryLevel, now);
+        this.dryGain.gain.setValueAtTime(this.params.noiseLevel, now);
+        this.wetGain.gain.setValueAtTime(this.params.dropReverbLevel.value, now);
+
+        // Set all parameters (in order!)
+        this.setNoiseType(this.params.noiseType); // ✅ this will start noise
+        this.setNoiseFilterFreq(this.params.noiseFilterFreq);
+        this.setDropReverbLevel(this.params.dropReverbLevel);
+        this.setDropRate(this.params.dropRate);
+        this.setPanRange(this.params.dropPanRange);
+
         this._startDrops();
     }
 
     public stop() {
         this.running = false;
-        if (this.noiseNode) this.noiseNode.stop();
-        if (this.dropInterval) clearInterval(this.dropInterval);
-    }
 
-    public setEQGains(gains: number[]) {
-        this.params.eqGains = gains;
-        gains.forEach((gain, i) => {
-            if (this.eqBands[i]) this.eqBands[i].gain.value = gain;
+        // Stop and disconnect the noise node
+        if (this.noiseNode) {
+            this.noiseNode.stop();
+            this.noiseNode.disconnect();
+            this.noiseNode = null;
+        }
+
+        // Clear the drop interval
+        if (this.dropInterval) {
+            clearInterval(this.dropInterval);
+            this.dropInterval = null;
+        }
+
+        // Stop and disconnect all LFOs
+        this.lfoMap.forEach(({ osc, gain }) => {
+            osc.stop();
+            osc.disconnect();
+            gain.disconnect();
         });
+        this.lfoMap.clear();
+
+        // Reset all gain nodes to zero to silence the audio
+        const now = this.audioCtx.currentTime;
+        this.output.gain.setValueAtTime(0, now);
+        this.noiseGainNode.gain.setValueAtTime(0, now);
+        this.dropGainNode.gain.setValueAtTime(0, now);
+        this.dryDropGainNode.gain.setValueAtTime(0, now);
+        this.dryGain.gain.setValueAtTime(0, now);
+        this.wetGain.gain.setValueAtTime(0, now);
     }
 
-    public setVolume(value: number) {
-        this.output.gain.value = value;
+    public setNoiseFilterFreq(param: OscParam) {
+        this.params.noiseFilterFreq = param;
+        this.setOscParam(param, this.noiseFilter.frequency, 'noiseFilterFreq');
+    }
+
+    public setDropReverbLevel(param: OscParam) {
+        this.params.dropReverbLevel = param;
+        this.setOscParam(param, this.wetGain.gain, 'dropReverbLevel');
+    }
+
+    public setDropRate(param: OscParam) {
+        this.params.dropRate = param;
+        if (this.dropInterval) clearInterval(this.dropInterval);
+        if (this.running) this._startDrops();
+    }
+
+    public setPanRange(param: OscParam) {
+        this.params.dropPanRange = param;
+    }
+
+    public setPitchRange(min: OscParam, max: OscParam) {
+        this.params.dropMinPitch = min;
+        this.params.dropMaxPitch = max;
+    }
+
+    public setDecayTime(param: OscParam) {
+        this.params.dropDecayTime = param;
     }
 
     public setNoiseLevel(value: number) {
@@ -171,56 +251,53 @@ export class RainGenerator {
         this.dropGainNode.gain.value = value;
     }
 
-    public setDropRate(value: number) {
-        this.params.dropRate = value;
-        if (this.dropInterval) clearInterval(this.dropInterval);
-        if (this.running) this._startDrops();
-    }
-
-    public setDropReverbLevel(value: number) {
-        this.params.dropReverbLevel = value;
-        this.wetGain.gain.value = value;
-    }
-
-    public setNoiseType(type: NoiseType) {
-        this.params.noiseType = type;
-        if (this.running) {
-            this._startNoise();
-        }
-    }
-
-    public setNoiseFilterFreq(value: number) {
-        this.params.noiseFilterFreq = value;
-        this.noiseFilter.frequency.value = value;
-    }
-
-    public setPanRange(value: number) {
-        this.params.dropPanRange = value;
-    }
-
     public setDropQ(value: number) {
         this.params.dropQ = value;
     }
 
-    public setPitchRange(min: number, max: number) {
-        this.params.dropMinPitch = min;
-        this.params.dropMaxPitch = max;
+    public setVolume(value: number) {
+        this.output.gain.value = value;
     }
 
-    public setDecayTime(seconds: number) {
-        this.params.dropDecayTime = seconds;
+    public setNoiseType(type: NoiseType) {
+        this.params.noiseType = type;
+
+        if (this.running) {
+            this._startNoise(); // ✅ no conditions — always run
+        }
+    }
+
+    public setParams(newParams: Partial<RainParams>) {
+        this._applyParams(newParams);
+    }
+
+    private _applyParams(newParams: Partial<RainParams>) {
+        const updated = { ...this.params, ...newParams };
+        if (newParams.eqGains?.length === this.eqBands.length) {
+            newParams.eqGains.forEach((gain, i) => {
+                this.eqBands[i].gain.value = gain;
+            });
+        }
+        this.params = updated;
     }
 
     private _startNoise() {
-        if (this.noiseNode) this.noiseNode.stop();
+        if (this.noiseNode) {
+            this.noiseNode.stop();
+            this.noiseNode.disconnect();
+            this.noiseNode = null;
+        }
+
         const bufferSize = 2 * this.audioCtx.sampleRate;
         const noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
+
         if (this.params.noiseType === 'white') {
             for (let i = 0; i < bufferSize; i++) {
                 output[i] = Math.random() * 2 - 1;
             }
         } else {
+            // Pink noise
             let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
             for (let i = 0; i < bufferSize; i++) {
                 const white = Math.random() * 2 - 1;
@@ -235,18 +312,18 @@ export class RainGenerator {
                 b6 = white * 0.115926;
             }
         }
+
         this.noiseNode = this.audioCtx.createBufferSource();
         this.noiseNode.buffer = noiseBuffer;
         this.noiseNode.loop = true;
-        this.noiseNode.connect(this.noiseGainNode);
+        this.noiseNode.connect(this.noiseGainNode); // ✅ must be connected
         this.noiseNode.start();
-        this.noiseGainNode.gain.value = this.params.volume * 0.4;
     }
 
     private _startDrops() {
         const playDrop = () => {
             const now = this.audioCtx.currentTime;
-            const duration = Math.min(this.params.dropDecayTime, 0.2);
+            const duration = Math.min(this.params.dropDecayTime.value ?? 0.2, 0.2);
             const buffer = this.audioCtx.createBuffer(1, this.audioCtx.sampleRate * duration, this.audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < data.length; i++) {
@@ -258,11 +335,11 @@ export class RainGenerator {
 
             const filter = this.audioCtx.createBiquadFilter();
             filter.type = 'bandpass';
-            filter.frequency.value = this.params.dropMinPitch + Math.random() * (this.params.dropMaxPitch - this.params.dropMinPitch);
+            filter.frequency.value = this.params.dropMinPitch.value + Math.random() * (this.params.dropMaxPitch.value - this.params.dropMinPitch.value);
             filter.Q.value = this.params.dropQ;
 
             const pan = this.audioCtx.createStereoPanner();
-            pan.pan.value = (Math.random() * 2 - 1) * this.params.dropPanRange;
+            pan.pan.value = (Math.random() * 2 - 1) * this.params.dropPanRange.value;
 
             const dryGain = this.audioCtx.createGain();
             dryGain.gain.value = this.params.dropDryLevel;
@@ -276,9 +353,10 @@ export class RainGenerator {
             drop.start(now);
         };
 
-        if (this.dropInterval) clearInterval(this.dropInterval);
-        const interval = 1000 / this.params.dropRate;
-        this.dropInterval = setInterval(playDrop, interval);
+        const baseRate = this.params.dropRate.value;
+        const baseInterval = 1000 / baseRate;
+
+        this.dropInterval = setInterval(playDrop, baseInterval);
     }
 
     public connect(node: AudioNode) {

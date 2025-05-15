@@ -1,7 +1,7 @@
-import { WeatherSynth } from "../components/WeatherSynth";
+import { NoiseDUI } from "../components/noised/NoiseDUI";
 
 const RainGeneratorPage = () => {
-    return <WeatherSynth />;
+    return <NoiseDUI />;
 }
 
 export default RainGeneratorPage;

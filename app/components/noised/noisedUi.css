@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+body {
+    background-color: #0a0a0a;
+    font-family: 'Audiowide', 'Courier New', monospace;
+    background-image: radial-gradient(circle at top center, #111 0%, #0a0a0a 100%);
+    background-attachment: fixed;
+}
+
+
+/* Noised logo title */
+.noides-controller-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-family: 'Audiowide', monospace;
+    font-weight: 900;
+    color: #f5deb3;
+    text-shadow:
+        0 0 4px #000,
+        0 0 8px #d4af37,
+        1px 1px 0px #000;
+    letter-spacing: 0.2em;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #d4af37;
+}
+
+/* Each setting block */
+.weather-panel {
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid #d4af37;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: inset 0 0 12px #000;
+}
+
+/* Equalizer (wintery style override) */
+.weather-panel.bg-\[\#2e2e2e\],
+.weather-panel.equalizer-panel {
+    background: linear-gradient(to bottom right, #444 0%, #1c1c1c 100%);
+    border-color: #a0a0a0;
+    box-shadow: inset 0 0 15px #222;
+}
+
+/* Panel headers */
+.panel-header {
+    color: #d4af37;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Select dropdown */
+.noise-type-selector {
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #111;
+    color: #fefefe;
+    border: 1px solid #d4af37;
+    font-family: 'Audiowide', monospace;
+    font-size: 0.9rem;
+    box-shadow: inset 0 0 4px #000;
+}

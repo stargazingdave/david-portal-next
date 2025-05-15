@@ -1,0 +1,55 @@
+.knob-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Courier New', monospace;
+    color: #d4af37;
+    text-shadow: 0 0 2px black;
+}
+
+.knob-label {
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.knob-body {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(ellipse at center, #222 0%, #000 100%);
+    border: 3px solid #d4af37;
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px #000, 0 0 6px #d4af3770;
+    cursor: grab;
+    user-select: none;
+}
+
+.knob-indicator {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 4px;
+    height: 28%;
+    background-color: #d4af37;
+    transform-origin: bottom center;
+    transition: transform 0.1s ease;
+    border-radius: 2px;
+}
+
+.led-ring {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #d4af37a0, inset 0 0 6px #d4af3730;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.knob-value {
+    font-size: 0.75rem;
+    color: #f5f5dc;
+}

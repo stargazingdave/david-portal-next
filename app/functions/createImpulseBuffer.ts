@@ -1,5 +1,5 @@
 export function createImpulseResponse(
-    ctx: AudioContext,
+    ctx: BaseAudioContext,
     duration: number = 2,
     decay: number = 2
 ): AudioBuffer {
