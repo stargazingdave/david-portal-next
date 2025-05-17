@@ -195,7 +195,7 @@ export default function RainSynth() {
             </div>
 
             <Knob
-              label={<span className="text-[#0ff]">{labels.noiseLevel}</span>}
+              label={labels.noiseLevel}
               value={params.noiseLevel}
               onChange={(value) => updateParam('noiseLevel', value)}
               min={0}
@@ -217,7 +217,7 @@ export default function RainSynth() {
         <h1>Drop Controls</h1>
         <div className="grid grid-cols-4 justify-center gap-6">
           <Knob
-            label={<span className="text-[#0ff] drop-shadow-sm">Drop Dry Level</span>}
+            label="Drop Dry Level"
             value={params.dropDryLevel}
             onChange={(value) => updateParam('dropDryLevel', value)}
             min={0}
@@ -225,7 +225,7 @@ export default function RainSynth() {
             step={0.01}
           />
           <Knob
-            label={<span className="text-[#0ff] drop-shadow-sm">Drop Wet Level</span>}
+            label="Drop Wet Level"
             value={params.dropWetLevel}
             onChange={(value) => updateParam('dropWetLevel', value)}
             min={0}
@@ -247,7 +247,7 @@ export default function RainSynth() {
             step={10}
           />
           <Knob
-            label={<span className="text-[#0ff] drop-shadow-sm">Drop Q</span>}
+            label="Drop Q"
             value={params.dropQ}
             onChange={(value) => updateParam('dropQ', value)}
             min={0}

@@ -78,7 +78,7 @@ export default function ThunderSynth() {
                     {(['rumbleFreqStart', 'rumbleFreqEnd', 'rumbleVolume', 'rumbleDecay'] as (keyof ThunderParams)[]).map((key) => (
                         <Knob
                             key={key}
-                            label={<span className="text-[#0ff] drop-shadow-sm">{labels[key]}</span>}
+                            label={labels[key]}
                             value={params[key] as number}
                             onChange={(value) => updateParam(key, value)}
                             min={key === 'rumbleVolume' ? 0 : key === 'rumbleDecay' ? 0.1 : 10}
@@ -108,7 +108,7 @@ export default function ThunderSynth() {
                     ] as (keyof ThunderParams)[]).map((key) => (
                         <Knob
                             key={key}
-                            label={<span className="text-[#0ff] drop-shadow-sm">{labels[key]}</span>}
+                            label={labels[key]}
                             value={params[key] as number}
                             onChange={(value) => updateParam(key, value)}
                             min={

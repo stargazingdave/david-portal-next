@@ -8,19 +8,19 @@ export interface ThunderParams {
     duration: RandParam;
     filterFreq: RandParam;
     burstCount: RandParam;
-    delayMs?: number;
-    reverbDuration?: RandParam;
-    reverbDecay?: RandParam;
-    reverbWetLevel?: RandParam;
-    subLevel?: RandParam;
-    panRange?: RandParam;
-    highPassFreq?: RandParam;
-    crackleAmount?: RandParam;
+    delayMs: number;
+    reverbDuration: RandParam;
+    reverbDecay: RandParam;
+    reverbWetLevel: RandParam;
+    subLevel: RandParam;
+    panRange: RandParam;
+    highPassFreq: RandParam;
+    crackleAmount: RandParam;
     eqGains: number[];
-    rumbleFreqStart?: RandParam;
-    rumbleFreqEnd?: RandParam;
-    rumbleVolume?: RandParam;
-    rumbleDecay?: RandParam;
+    rumbleFreqStart: RandParam;
+    rumbleFreqEnd: RandParam;
+    rumbleVolume: RandParam;
+    rumbleDecay: RandParam;
 }
 
 export const _defaultThunderParams: ThunderParams = {

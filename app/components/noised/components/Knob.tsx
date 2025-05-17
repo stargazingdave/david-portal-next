@@ -1,103 +1,65 @@
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from 'react';
 
-interface KnobProps {
-    label: ReactNode;
-    value: number;
-    onChange: (newValue: number) => void;
-    min: number;
-    max: number;
-    step?: number;
-}
-
-export const Knob: FC<KnobProps> = ({
+export const Knob = ({
     label,
     value,
+    min = 0,
+    max = 1,
+    step = 0.01,
     onChange,
-    min,
-    max,
-    step = (max - min) / 100,
+}: {
+    label: string;
+    value: number;
+    min?: number;
+    max?: number;
+    step?: number;
+    onChange: (newVal: number) => void;
 }) => {
+    const [internalVal, setInternalVal] = useState(value);
     const knobRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const lastAngleRef = useRef<number | null>(null);
+    const deg = ((internalVal - min) / (max - min)) * 270 - 135;
 
-    const valueToAngle = (val: number) => {
-        return -135 + ((val - min) / (max - min)) * 270;
+    useEffect(() => setInternalVal(value), [value]);
+
+    const handleDrag = (e: React.MouseEvent) => {
+        const startY = e.clientY;
+        const startVal = internalVal;
+
+        const moveHandler = (moveEvent: MouseEvent) => {
+            const delta = startY - moveEvent.clientY;
+            const range = max - min;
+            let newVal = startVal + (delta / 100) * range;
+            newVal = Math.round((Math.min(max, Math.max(min, newVal))) / step) * step;
+            newVal = parseFloat(newVal.toFixed(2)); // control precision
+            setInternalVal(newVal);
+            onChange(newVal);
+        };
+
+        const upHandler = () => {
+            document.removeEventListener('mousemove', moveHandler);
+            document.removeEventListener('mouseup', upHandler);
+        };
+
+        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('mouseup', upHandler);
     };
-
-    const angleToValue = (angle: number) => {
-        const clampedAngle = Math.max(-135, Math.min(135, angle));
-        const percent = (clampedAngle + 135) / 270;
-        const val = min + percent * (max - min);
-        const stepped = Math.round(val / step) * step;
-        return parseFloat(stepped.toFixed(2));
-    };
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isDragging || !knobRef.current) return;
-
-            const rect = knobRef.current.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            const dx = e.clientX - cx;
-            const dy = e.clientY - cy;
-
-            let angle = Math.atan2(dy, dx) * (180 / Math.PI); // -180..180
-
-            if (angle < -135) angle = -135;
-            if (angle > 135) angle = 135;
-
-            // Prevent jumping over the min/max edges
-            const last = lastAngleRef.current;
-            if (last !== null) {
-                const delta = angle - last;
-                if (Math.abs(delta) > 180) return; // ignore weird wrap jumps
-            }
-            lastAngleRef.current = angle;
-
-            const newValue = angleToValue(angle);
-            onChange(newValue);
-        };
-
-        const handleMouseUp = () => {
-            setIsDragging(false);
-            lastAngleRef.current = null;
-        };
-
-        if (isDragging) {
-            window.addEventListener("mousemove", handleMouseMove);
-            window.addEventListener("mouseup", handleMouseUp);
-        }
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [isDragging, min, max, step, onChange]);
-
-    const rotation = valueToAngle(value);
 
     return (
-        <div className="flex flex-col items-center gap-2 select-none">
-            <label>{label}</label>
+        <div className="flex flex-col items-center gap-1 font-[courier] text-amber-100">
+            {/* Label */}
+            <div className="text-sm text-center">{label}</div>
+            {/* Knob */}
             <div
+                className="relative w-20 h-20 border-2 border-amber-400 rounded-full shadow-inner cursor-grab select-none"
                 ref={knobRef}
-                onMouseDown={() => {
-                    setIsDragging(true);
-                    lastAngleRef.current = valueToAngle(value);
-                }}
-                className="relative w-16 h-16 rounded-full border-2 border-[#00faff] bg-[#111] shadow-[inset_0_0_10px_#00faff44,0_0_6px_#00faff66] transition-transform hover:scale-105 cursor-pointer"
+                onMouseDown={handleDrag}
             >
-                <div
-                    className="absolute left-1/2 top-1/2 w-[2px] h-6 bg-[#0ff] origin-bottom"
-                    style={{
-                        transform: `translate(-50%, -100%) rotate(${rotation}deg)`
-                    }}
-                />
+                {/* Knob Indicator */}
+                <div className="absolute top-[10%] left-1/2 w-1 h-[28%] bg-amber-400 transition-transform duration-100 ease-in-out rounded-xs" style={{ transform: `rotate(${deg}deg)`, transformOrigin: 'bottom center' }} />
+                {/* Knob Background */}
+                <div className="absolute top-2 left-2 right-2 bottom-2 rounded-full z-0 pointer-events-none" style={{ boxShadow: '0 0 8px #d4af37a0, inset 0 0 6px #d4af3730' }} />
             </div>
-            <label>{value}</label>
+            <div className="text-xs text-amber-100">{internalVal.toFixed(2)}</div>
         </div>
     );
 };

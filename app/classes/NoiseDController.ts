@@ -287,4 +287,12 @@ export class NoiseDController<T extends BaseAudioContext = AudioContext> {
         this.params.rainParams = newRainParams;
         this.rain.setParams(newRainParams);
     }
+
+    public setThunderParams(newParams: Partial<ThunderParams>) {
+        this.thunder.setParams(newParams);
+        this.params.thunderParams = { ...this.params.thunderParams, ...newParams };
+        if (newParams.reverbDuration || newParams.reverbDecay) {
+            this.thunder.setGeneratedReverb();
+        }
+    }
 }
