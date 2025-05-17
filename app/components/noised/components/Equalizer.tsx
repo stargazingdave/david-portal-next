@@ -35,7 +35,7 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
     ]
 
     return (
-        <div className="flex p-4 h-50 w-full">
+        <div className="flex p-4 h-50 w-96">
             {/* Ruler */}
             <div className="h-full flex flex-col justify-between items-end pr-1 text-xs text-gray-500 text-nowrap gap-2">
                 <div className="h-full flex flex-col justify-between items-end pr-1 text-xs text-gray-500">
@@ -71,7 +71,7 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
                                 handleDrag(e as unknown as React.MouseEvent, i)
                             }}
                         >
-                            <div className="relative h-full w-8 bg-gray-700 rounded overflow-hidden">
+                            <div className="relative h-full w-6 bg-gray-700 rounded overflow-hidden">
                                 <div
                                     className="absolute bottom-0 w-full bg-sky-500"
                                     style={{ height: `${percent * 100}%` }}

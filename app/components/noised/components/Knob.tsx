@@ -6,6 +6,8 @@ export const Knob = ({
     min = 0,
     max = 1,
     step = 0.01,
+    small = false,
+    disabled = false,
     onChange,
 }: {
     label: string;
@@ -13,6 +15,8 @@ export const Knob = ({
     min?: number;
     max?: number;
     step?: number;
+    small?: boolean;
+    disabled?: boolean;
     onChange: (newVal: number) => void;
 }) => {
     const [internalVal, setInternalVal] = useState(value);
@@ -22,6 +26,8 @@ export const Knob = ({
     useEffect(() => setInternalVal(value), [value]);
 
     const handleDrag = (e: React.MouseEvent) => {
+        if (disabled) return;
+
         const startY = e.clientY;
         const startVal = internalVal;
 
@@ -30,7 +36,7 @@ export const Knob = ({
             const range = max - min;
             let newVal = startVal + (delta / 100) * range;
             newVal = Math.round((Math.min(max, Math.max(min, newVal))) / step) * step;
-            newVal = parseFloat(newVal.toFixed(2)); // control precision
+            newVal = parseFloat(newVal.toFixed(2));
             setInternalVal(newVal);
             onChange(newVal);
         };
@@ -44,22 +50,37 @@ export const Knob = ({
         document.addEventListener('mouseup', upHandler);
     };
 
+    const sizeClass = small ? 'w-12 h-12' : 'w-20 h-20';
+    const indicatorHeight = small ? 'h-[24%]' : 'h-[28%]';
+    const fontSize = small ? 'text-xs' : 'text-sm';
+    const knobOpacity = disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-grab';
+    const indicatorTopPosition = small ? 'top-[28%]' : 'top-[18%]';
+
     return (
-        <div className="flex flex-col items-center gap-1 font-[courier] text-amber-100">
-            {/* Label */}
-            <div className="text-sm text-center">{label}</div>
-            {/* Knob */}
+        <div className={`flex flex-col max-w-40 items-center gap-1 font-[courier] ${fontSize} ${disabled ? 'text-amber-200 opacity-50' : 'text-amber-100'} transition`}>
+            <div className="text-center text-wrap">{label}</div>
             <div
-                className="relative w-20 h-20 border-2 border-amber-400 rounded-full shadow-inner cursor-grab select-none"
+                className={`relative ${sizeClass} border-2 border-amber-400 rounded-full shadow-inner select-none ${knobOpacity}`}
                 ref={knobRef}
                 onMouseDown={handleDrag}
             >
-                {/* Knob Indicator */}
-                <div className="absolute top-[10%] left-1/2 w-1 h-[28%] bg-amber-400 transition-transform duration-100 ease-in-out rounded-xs" style={{ transform: `rotate(${deg}deg)`, transformOrigin: 'bottom center' }} />
-                {/* Knob Background */}
-                <div className="absolute top-2 left-2 right-2 bottom-2 rounded-full z-0 pointer-events-none" style={{ boxShadow: '0 0 8px #d4af37a0, inset 0 0 6px #d4af3730' }} />
+                <div
+                    className={`absolute ${indicatorTopPosition} left-1/2 w-1 ${indicatorHeight} origin-bottom transition-transform duration-100 ease-in-out rounded-xs`}
+                    style={{
+                        transform: `rotate(${deg}deg)`,
+                        backgroundColor: disabled ? '#666' : '#fbbf24', // darker if disabled
+                    }}
+                />
+                <div
+                    className="absolute top-2 left-2 right-2 bottom-2 rounded-full z-0 pointer-events-none"
+                    style={{
+                        boxShadow: disabled
+                            ? 'inset 0 0 6px #444'
+                            : '0 0 8px #d4af37a0, inset 0 0 6px #d4af3730',
+                    }}
+                />
             </div>
-            <div className="text-xs text-amber-100">{internalVal.toFixed(2)}</div>
+            <div className="text-[10px]">{internalVal.toFixed(2)}</div>
         </div>
     );
 };
