@@ -34,10 +34,10 @@ const getCodeProjects = (): CodeProject[] => {
                 dark: '/images/dnoise-logo-dark.png',
             },
             links: {
-                demo: 'https://yourdomain.com/dnoise/demo',
-                docs: 'https://yourdomain.com/dnoise/docs',
-                github: 'https://github.com/yourrepo/dnoise',
-                npm: 'https://www.npmjs.com/package/dnoise',
+                demo: '/weather_synth',
+                // docs: 'https://yourdomain.com/dnoise/docs',
+                github: 'https://github.com/stargazingdave/noised',
+                npm: 'https://www.npmjs.com/package/noised',
             },
             status: 'dev',
             tech: ['typescript']

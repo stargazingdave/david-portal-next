@@ -2,26 +2,34 @@
 
 
 import React, { FC, useRef, useState } from 'react';
-import { NoiseDParams, NoiseDController, Range, _defaultNoiseDParams } from '../../classes/NoiseDController';
-import { _defaultThunderParams, ThunderParams } from '../../classes/ThunderGenerator';
-import { _defaultRainParams, NoiseType, RainParams } from '../../classes/RainGenerator';
 import { Equalizer } from './components/Equalizer';
 import { Knob } from './components/Knob';
 import Image from 'next/image';
 import { OscParam } from './types/OscParam';
 import { OscParamController } from './components/OscParamController';
 import { RandParamController } from './components/RandParamController';
+import { IoDownload, IoPlay, IoStop } from 'react-icons/io5';
+import { Visualization } from '../Visualization';
+import { _defaultNoiseDParams, NoiseDController, NoiseDParams, NoiseType, ThunderParams, Range } from 'noised';
 
 export const NoiseDUI = () => {
     const audioCtxRef = useRef<AudioContext | null>(null);
     const controllerRef = useRef<NoiseDController | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [params, setParams] = useState<NoiseDParams>(_defaultNoiseDParams);
+    const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
+
 
     const handleVolumeChange = (value: number) => {
         const updated = { ...params, masterVolume: value };
         setParams(updated);
         controllerRef.current?.setMasterVolume(value);
+    };
+
+    const handleDelayBetweenThundersChange = (type: 'min' | 'max', value: number) => {
+        const updated = { ...params, delayBetweenThunders: { ...params.delayBetweenThunders, [type]: value } };
+        setParams(updated);
+        controllerRef.current?.setDelayBetweenThunders(updated.delayBetweenThunders);
     };
 
     const handleEqChange = (index: number, value: number) => {
@@ -84,7 +92,7 @@ export const NoiseDUI = () => {
         controllerRef.current?.setRainDropQ(param);
     }
 
-    const handleRainDropRateChange = (param: OscParam) => {
+    const handleRainDropRateChange = (param: number) => {
         const updatedRainParams = { ...params.rainParams, dropRate: param };
         setParams({ ...params, rainParams: updatedRainParams });
         controllerRef.current?.setRainDropRate(param);
@@ -102,7 +110,7 @@ export const NoiseDUI = () => {
         controllerRef.current?.setRainDropMaxPitch(param);
     }
 
-    const handleRainDropDecayTimeChange = (param: OscParam) => {
+    const handleRainDropDecayTimeChange = (param: number) => {
         const updatedRainParams = { ...params.rainParams, dropDecayTime: param };
         setParams({ ...params, rainParams: updatedRainParams });
         controllerRef.current?.setRainDropDecayTime(param);
@@ -116,7 +124,11 @@ export const NoiseDUI = () => {
 
     const toggle = () => {
         if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-        if (!controllerRef.current) controllerRef.current = new NoiseDController(audioCtxRef.current, params);
+
+        if (!controllerRef.current) {
+            controllerRef.current = new NoiseDController(audioCtxRef.current, params);
+            setAnalyserNode(controllerRef.current.getAnalyser()); // 👈 hook up the visualizer
+        }
 
         if (isRunning) {
             controllerRef.current.stop();
@@ -126,19 +138,53 @@ export const NoiseDUI = () => {
         setIsRunning(!isRunning);
     };
 
+    const handleDownloadParams = () => {
+        if (!controllerRef.current) return;
+        const json = controllerRef.current.exportParamsAsJSON();
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'noised-params.json';
+        a.click();
+
+        URL.revokeObjectURL(url);
+    };
+
     return <div className="flex flex-col items-center w-full h-fit p-8">
-        <div className="w-full p-4 bg-cover border border-gray-800 rounded-lg shadow-lg shadow-gray-700/50 text-white"
-            style={{ background: "url('/grill-cloth-texture.jpg') repeat" }}
-        >
-            <Image
-                src="/images/dnoise-logo-dark.png"
-                width={100}
-                height={100}
-                alt="NoiseD"
-            />
-            <div className="flex justify-center">
-                <button onClick={toggle} className="bg-amber-400 dark:bg-amber-400 text-black font-bold py-2 px-4 rounded-full hover:bg-amber-500 transition duration-300 ease-in-out cursor-pointer">
-                    {isRunning ? 'Stop' : 'Start'} Ambience
+        <div className="w-full p-4 bg-cover border border-gray-800 rounded-lg shadow-lg shadow-gray-700/50 text-white">
+            <div className="relative flex flex-wrap justify-around mb-4">
+                <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded-lg z-0 pointer-events-none">
+                    <Visualization
+                        analyserRef={{ current: analyserNode }}
+                        isPlaying={isRunning}
+                        type="waveform"
+                        barCount={48}
+                    />
+                </div>
+
+                {/* Foreground elements */}
+                <Image
+                    src="/images/dnoise-logo-dark.png"
+                    width={100}
+                    height={100}
+                    alt="NoiseD"
+                    className="z-10"
+                />
+                <button
+                    onClick={toggle}
+                    className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                    title={isRunning ? "Stop" : "Start"}
+                >
+                    {isRunning ? <IoStop size={50} /> : <IoPlay size={50} />}
+                </button>
+                <button
+                    onClick={handleDownloadParams}
+                    className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                    title="Download Params"
+                >
+                    <IoDownload size={50} />
                 </button>
             </div>
             <div className="space-y-6 mt-6">
@@ -155,7 +201,7 @@ export const NoiseDUI = () => {
                         <MinMaxPair
                             label="Thunder Delay"
                             range={params.delayBetweenThunders}
-                            onChange={(type, value) => { }}
+                            onChange={(type, value) => handleDelayBetweenThundersChange(type, value)}
                             min={1000}
                             max={30000}
                         />
@@ -206,8 +252,8 @@ export const NoiseDUI = () => {
                                     onChange={(p: OscParam) => handleRainNoiseFilterFreqChange(p)}
                                     valueRange={[20, 8000]}
                                     ampRange={[0, 2000]}
-                                    freqRange={[0.01, 100]}
-                                    step={10}
+                                    freqRange={[0, 1]}
+                                    step={0.01}
                                 />
                             </div>
                         </Section>
@@ -234,13 +280,31 @@ export const NoiseDUI = () => {
                                         onChange={(value) => handleRainDropWetLevelChange(value)}
                                     />
                                 </div>
+                                <div className='flex gap-4'>
+                                    <Knob
+                                        label="Q"
+                                        value={params.rainParams.dropQ}
+                                        onChange={(value) => handleRainDropQChange(value)}
+                                        min={0}
+                                        max={5}
+                                        step={0.1}
+                                    />
+                                    <Knob
+                                        label="Rate"
+                                        value={params.rainParams.dropRate}
+                                        onChange={(value) => handleRainDropRateChange(value)}
+                                        min={0.1}
+                                        max={200}
+                                        step={0.1}
+                                    />
+                                </div>
                                 <Knob
-                                    label="Drop Q"
-                                    value={params.rainParams.dropQ}
-                                    onChange={(value) => handleRainDropQChange(value)}
-                                    min={0}
-                                    max={5}
-                                    step={0.1}
+                                    label="Decay Time"
+                                    value={params.rainParams.dropDecayTime}
+                                    onChange={(value) => handleRainDropDecayTimeChange(value)}
+                                    min={0.01}
+                                    max={1}
+                                    step={0.01}
                                 />
                             </div>
 
@@ -250,25 +314,18 @@ export const NoiseDUI = () => {
                                     param={params.rainParams.dropReverbLevel}
                                     onChange={(p: OscParam) => handleRainDropReverbLevelChange(p)}
                                     valueRange={[0, 1]}
-                                    ampRange={[0, 2000]}
-                                    freqRange={[0.01, 100]}
-                                    step={0.1}
+                                    ampRange={[0, 1]}
+                                    freqRange={[0, 1]}
+                                    step={0.01}
                                 />
                                 <OscParamController
                                     label="Pan Range"
                                     param={params.rainParams.dropPanRange}
                                     onChange={(p) => handleRainDropPanRangeChange(p)}
-                                    valueRange={[20, 8000]}
-                                    step={10}
-                                />
-
-                                <OscParamController
-                                    label="Drop Rate"
-                                    param={params.rainParams.dropRate}
-                                    onChange={(p) => handleRainDropRateChange(p)}
-                                    valueRange={[20, 8000]}
-                                    ampRange={[0, 1000]}
-                                    step={10}
+                                    valueRange={[0, 1]}
+                                    ampRange={[0, 1]}
+                                    freqRange={[0, 5]}
+                                    step={0.01}
                                 />
                                 <OscParamController
                                     label="Drop Min Pitch"
@@ -285,13 +342,6 @@ export const NoiseDUI = () => {
                                     valueRange={[20, 8000]}
                                     ampRange={[0, 1000]}
                                     step={10}
-                                />
-                                <OscParamController
-                                    label="Drop Decay Time"
-                                    param={params.rainParams.dropDecayTime}
-                                    onChange={(p) => handleRainDropDecayTimeChange(p)}
-                                    valueRange={[0.005, 1]}
-                                    step={0.001}
                                 />
                             </div>
                         </div>
@@ -413,7 +463,7 @@ export const NoiseDUI = () => {
                                 onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
                                 valueRange={[20, 100]}
                                 ampRange={[0, 10]}
-                                step={10}
+                                step={1}
                             />
                             <RandParamController
                                 label="Rumble Freq End"
@@ -421,7 +471,7 @@ export const NoiseDUI = () => {
                                 onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
                                 valueRange={[20, 1000]}
                                 ampRange={[0, 10]}
-                                step={10}
+                                step={1}
                             />
                             <RandParamController
                                 label="Rumble Volume"
