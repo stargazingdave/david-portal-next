@@ -21,7 +21,7 @@ const getCodeProjects = (): CodeProject[] => {
                 website: 'https://dannykrivosh.com',
                 github: 'https://github.com/stargazingdave/danny-krivosh-next-app',
             },
-            status: 'dev',
+            status: 'prod',
             tech: ['react', 'nextjs', 'tailwind', 'typescript']
         },
         {
@@ -39,7 +39,7 @@ const getCodeProjects = (): CodeProject[] => {
                 github: 'https://github.com/stargazingdave/noised',
                 npm: 'https://www.npmjs.com/package/noised',
             },
-            status: 'dev',
+            status: 'prod',
             tech: ['typescript']
         },
         {

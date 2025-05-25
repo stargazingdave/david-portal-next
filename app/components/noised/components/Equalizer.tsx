@@ -73,7 +73,7 @@ export const Equalizer: FC<EqualizerProps> = ({ gains, freqs, onChange, min = -1
                         >
                             <div className="relative h-full w-6 bg-gray-700 rounded overflow-hidden">
                                 <div
-                                    className="absolute bottom-0 w-full bg-sky-500"
+                                    className="absolute bottom-0 w-full bg-amber-500"
                                     style={{ height: `${percent * 100}%` }}
                                 />
                             </div>

@@ -1,4 +1,4 @@
-import { Card } from "@/.yalc/@dpdev/nucleard/dist";
+import { Card } from "@dpdev/nucleard";
 import { FC, ReactNode, useState } from "react";
 import { HiChevronDown, HiChevronRight } from "react-icons/hi2";
 

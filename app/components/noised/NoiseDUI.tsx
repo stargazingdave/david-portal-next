@@ -1,16 +1,20 @@
 'use client';
 
 
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Equalizer } from './components/Equalizer';
 import { Knob } from './components/Knob';
 import Image from 'next/image';
 import { OscParam } from './types/OscParam';
 import { OscParamController } from './components/OscParamController';
 import { RandParamController } from './components/RandParamController';
-import { IoDownload, IoPlay, IoStop } from 'react-icons/io5';
+import { IoChevronDown, IoChevronUp, IoDownload, IoPlay, IoStop } from 'react-icons/io5';
 import { Visualization } from '../Visualization';
 import { _defaultNoiseDParams, NoiseDController, NoiseDParams, NoiseType, ThunderParams, Range } from 'noised';
+import { SineWave } from './components/demos/SineWave';
+import { RandomBar } from './components/demos/RandomBar';
+import { RandParam } from './types/RandParam';
+import { Tooltip } from '../Tooltip';
 
 export const NoiseDUI = () => {
     const audioCtxRef = useRef<AudioContext | null>(null);
@@ -18,7 +22,20 @@ export const NoiseDUI = () => {
     const [isRunning, setIsRunning] = useState(false);
     const [params, setParams] = useState<NoiseDParams>(_defaultNoiseDParams);
     const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
+    const [showInstructions, setShowInstructions] = useState(false);
 
+    useEffect(() => {
+        return () => {
+            if (controllerRef.current) {
+                controllerRef.current.stop();
+                controllerRef.current = null;
+            }
+            if (audioCtxRef.current) {
+                audioCtxRef.current.close();
+                audioCtxRef.current = null;
+            }
+        };
+    }, []);
 
     const handleVolumeChange = (value: number) => {
         const updated = { ...params, masterVolume: value };
@@ -154,7 +171,7 @@ export const NoiseDUI = () => {
 
     return <div className="flex flex-col items-center w-full h-fit p-8">
         <div className="w-full p-4 bg-cover border border-gray-800 rounded-lg shadow-lg shadow-gray-700/50 text-white">
-            <div className="relative flex flex-wrap justify-around mb-4">
+            <div className="relative flex flex-wrap items-center justify-around mb-4">
                 <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded-lg z-0 pointer-events-none">
                     <Visualization
                         analyserRef={{ current: analyserNode }}
@@ -172,22 +189,37 @@ export const NoiseDUI = () => {
                     alt="NoiseD"
                     className="z-10"
                 />
+
                 <button
                     onClick={toggle}
-                    className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                    className="h-fit flex text-white font-bold py-2 px-4 rounded-full bg-amber-500 hover:bg-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
                     title={isRunning ? "Stop" : "Start"}
                 >
-                    {isRunning ? <IoStop size={50} /> : <IoPlay size={50} />}
+                    {isRunning ? "Silence!" : "Start the Noise!"}
                 </button>
-                <button
-                    onClick={handleDownloadParams}
-                    className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
-                    title="Download Params"
-                >
-                    <IoDownload size={50} />
-                </button>
+                <Tooltip content="Download a JSON file with the current parameters" placement="top">
+                    <button
+                        onClick={handleDownloadParams}
+                        className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                        title="Download Params"
+                    >
+                        <IoDownload size={50} />
+                    </button>
+                </Tooltip>
             </div>
             <div className="space-y-6 mt-6">
+                <Panel title={<div className='flex items-center gap-2'>
+                    <span>Instructions</span>
+                    <button
+                        onClick={() => setShowInstructions(!showInstructions)}
+                        className="text-amber-500 font-bold p-2 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer"
+                        title={showInstructions ? "Hide Instructions" : "Show Instructions"}
+                    >
+                        {showInstructions ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
+                    </button>
+                </div>}>
+                    {showInstructions && <Instructions />}
+                </Panel>
                 <Panel title='Master'>
                     <div className='flex flex-wrap items-center justify-around gap-4'>
                         <Knob
@@ -199,7 +231,7 @@ export const NoiseDUI = () => {
                             onChange={handleVolumeChange}
                         />
                         <MinMaxPair
-                            label="Thunder Delay"
+                            label="Delay Between Thunders"
                             range={params.delayBetweenThunders}
                             onChange={(type, value) => handleDelayBetweenThundersChange(type, value)}
                             min={1000}
@@ -498,7 +530,7 @@ export const NoiseDUI = () => {
 };
 
 const Panel: FC<{
-    title: string,
+    title: React.ReactNode,
     children?: React.ReactNode
 }> = ({ title, children }) => {
     return <div className="flex flex-col bg-neutral-800 border-4 border-yellow-700 rounded p-4 shadow-inner gap-2 font-[courier] text-amber-100">
@@ -575,3 +607,62 @@ const MinMaxPair = ({
         </div>
     </div>
 );
+
+
+const Instructions: FC = () => {
+    const [sine, setSine] = useState<OscParam>({
+        amp: 0.1,
+        freq: 1,
+        osc: true,
+        value: 0.5,
+    });
+    const [rand, setRand] = useState<RandParam>({
+        dist: 0.1,
+        rand: true,
+        value: 0.5,
+    });
+
+    return <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-4 text-wrap'>
+        <div className='flex flex-col gap-4 text-lg'>
+            <p>This is a demonstration of the NoiseD audio engine.</p>
+            <p>When playing, you will hear the generated rain and the ocasional generated thunder.</p>
+            <p>The controls are separated into 3 sections:</p>
+        </div>
+        <Section title='Master Controls'>
+            <ul>
+                <li>Volume</li>
+                <li>Equalizer</li>
+                <li>Delay Between Thunders</li>
+            </ul>
+        </Section>
+        <Section title='Rain Settings'>
+            <p>Various controls, some can oscillate around the set value.</p>
+            <p>You can adjust the amplitude and frequency of the oscillations.</p>
+            <div className='w-64 flex gap-4'>
+                <OscParamController
+                    label="Sine Wave"
+                    param={sine}
+                    onChange={(p: OscParam) => setSine(p)}
+                    valueRange={[0, 1]}
+                    ampRange={[0, 1]}
+                    freqRange={[0, 10]}
+                />
+                <SineWave param={sine} />
+            </div>
+        </Section>
+        <Section title='Thunder Settings'>
+            <p>Various controls, most can randomize around the set value, so each thunder strike is a little different.</p>
+            <p>You can adjust the maximum distance to allow random values to deviate from the set value.</p>
+            <div className='w-64 flex gap-4'>
+                <RandParamController
+                    label="Random"
+                    param={rand}
+                    onChange={(p: RandParam) => setRand(p)}
+                    valueRange={[0, 1]}
+                    ampRange={[0, 1]}
+                />
+                <RandomBar param={rand} />
+            </div>
+        </Section>
+    </div>
+}

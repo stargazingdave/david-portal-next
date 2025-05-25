@@ -11,8 +11,8 @@ export const Sidebar = () => {
         label: string,
         href: string,
     }[] = [
-            { label: 'Rain Synth', href: '/rain_synth' },
-            { label: 'Thunder Synth', href: '/thunder_synth' },
+            { label: 'Code', href: '/code' },
+            { label: 'Weather Synth', href: '/weather_synth' },
         ];
 
     return (
