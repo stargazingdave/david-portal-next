@@ -19,7 +19,7 @@ export function HomePage() {
   ]
   return (
     <div className="w-full h-full min-h-full flex flex-col items-center p-4 relative">
-      <div className="fixed top-0 left-0 w-1/3 h-[150%] opacity-50 z-[-10] pl-32 pointer-events-none">
+      <div className="fixed top-0 left-0 w-1/3 h-[150%] z-[-10] pl-32 pointer-events-none">
         <div className="relative h-full w-full">
           <Image
             src="/images/dpd-logo.png"
