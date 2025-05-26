@@ -24,15 +24,20 @@ const ThemeSelector: React.FC = () => {
     const effectiveTheme = theme === 'system' ? resolvedTheme : theme;
 
     const iconMap = {
-        light: <MdLightMode />,
-        dark: <MdDarkMode />
+        light: <MdLightMode size={20} />,
+        dark: <MdDarkMode size={20} />
     };
 
     return (
-        <Select.Root key={theme} value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
+        <Select.Root
+            key={theme}
+            value={theme}
+            onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
+            aria-label="Theme Selector"
+        >
             <Select.Trigger
                 aria-label="Theme"
-                className="inline-flex items-center justify-between gap-2 px-3 py-2 rounded text-sm border"
+                className="inline-flex items-center justify-between gap-2 px-3 py-2 rounded text-sm border cursor-pointer"
             >
                 <Select.Value>{iconMap[effectiveTheme]}</Select.Value>
                 <Select.Icon>
@@ -43,27 +48,29 @@ const ThemeSelector: React.FC = () => {
                 <Select.Content
                     className="z-50 bg-[var(--background)] text-[var(--foreground)] border rounded shadow"
                     position="popper"
+                    sideOffset={5}
+                    align="end"
                 >
                     <Select.Viewport className="p-1">
-                        <Select.Item value="light" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <Select.Item value="light" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                             <div className="flex items-center gap-2">
-                                <MdLightMode />
+                                {iconMap.light}
                                 Light
                             </div>
                             <Select.ItemIndicator className="ml-auto">
                                 <FaCheck />
                             </Select.ItemIndicator>
                         </Select.Item>
-                        <Select.Item value="dark" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <Select.Item value="dark" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                             <div className="flex items-center gap-2">
-                                <MdDarkMode />
+                                {iconMap.dark}
                                 Dark
                             </div>
                             <Select.ItemIndicator className="ml-auto">
                                 <FaCheck />
                             </Select.ItemIndicator>
                         </Select.Item>
-                        <Select.Item value="system" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <Select.Item value="system" className="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                             <div className="flex items-center gap-2">
                                 {iconMap[resolvedTheme]}
                                 System
