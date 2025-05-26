@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@dpdev/nucleard": "^0.0.5",
+    "@radix-ui/react-select": "^2.2.5",
     "next": "15.2.4",
     "noised": "^0.0.1",
     "react": "^19.0.0",

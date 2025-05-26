@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC } from "react";
 import { HiOutlineMenu } from "react-icons/hi";
+import ThemeSelector from "./ThemeSelector";
 
 interface NavbarProps {
     sidebarOpen: boolean;
@@ -33,6 +34,8 @@ export const Navbar: FC<NavbarProps> = ({
                 </Link>
                 <p className="font-extralight"><b className="font-bold">d</b>avid<b className="font-bold">p</b>ortal.<b className="font-bold">d</b>ev</p>
             </div>
+
+            <ThemeSelector />
         </div>
     );
 }

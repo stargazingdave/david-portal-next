@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "./components/Navbar";
 import { Sidebar } from "./components/Sidebar";
 import ClientLayout from "./ClientLayout";
+import { ThemeProvider } from "./contexts/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${comfortaa.variable} antialiased h-screen w-screen overflow-hidden`}>
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <ThemeProvider>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </ThemeProvider>
       </body>
     </html>
   );
