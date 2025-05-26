@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Comfortaa } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "./components/Navbar";
-import { Sidebar } from "./components/Sidebar";
 import ClientLayout from "./ClientLayout";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 

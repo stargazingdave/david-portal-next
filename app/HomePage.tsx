@@ -51,6 +51,7 @@ export function HomePage() {
               overlayColor='rgba(0,0,0,0.1)'
               className="h-full w-full flex items-center justify-center cursor-pointer text-gray-500 hover:text-white transition duration-200 ease-in-out"
               glassy
+              hoverable
             >
               <p className="text-4xl sm:text-6xl">
                 {page.label}
