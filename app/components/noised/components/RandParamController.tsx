@@ -2,7 +2,7 @@
 
 import { RandParam } from '../types/RandParam';
 import { AmpToggleSwitch } from './AmpToggleSwitch';
-import { Knob } from './NewKnob';
+import { Knob } from './Knob';
 import React from 'react';
 
 interface RandParamControllerProps {

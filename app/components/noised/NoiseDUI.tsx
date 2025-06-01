@@ -373,7 +373,7 @@ export const NoiseDUI = () => {
                                     onChange={(p) => handleRainDropMaxPitchChange(p)}
                                     valueRange={[20, 8000]}
                                     ampRange={[0, 1000]}
-                                    step={10}
+                                    step={1}
                                 />
                             </div>
                         </div>

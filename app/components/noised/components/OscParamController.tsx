@@ -32,7 +32,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
     <div className="flex flex-col justify-around gap-2 p-4 rounded bg-[#111] border border-[#333] font-[courier] shadow-inner">
       <div className="text-[#aaa]">{label}</div>
 
-      <div className='flex items-end gap-2'>
+      <div className='flex items-end gap-4'>
         <div className='flex flex-col items-center gap-2'>
           <Knob
             value={param.value}
@@ -41,6 +41,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
             max={valueRange[1]}
             step={step}
             label="Value"
+            size={80}
           />
         </div>
 
@@ -59,9 +60,9 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               onChange={(val) => update({ amp: val })}
               min={ampRange[0]}
               max={ampRange[1]}
-              step={0.01}
+              step={step}
               label="Amp"
-              small
+              size={50}
               disabled={!param.osc}
             />
             <Knob
@@ -71,7 +72,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               max={freqRange[1]}
               step={0.01}
               label="Freq"
-              small
+              size={50}
               disabled={!param.osc}
             />
           </div>
