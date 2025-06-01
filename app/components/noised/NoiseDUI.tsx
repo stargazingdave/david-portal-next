@@ -55,6 +55,12 @@ export const NoiseDUI = () => {
         controllerRef.current?.setEqGain(index, value);
     };
 
+    const handleRainVolumeChange = (value: number) => {
+        const updated = { ...params, rainParams: { ...params.rainParams, volume: value } };
+        setParams(updated);
+        controllerRef.current?.setRainVolume(value);
+    };
+
     const handleNoiseLevelChange = (value: number) => {
         const updated = { ...params, noiseLevel: value };
         setParams(updated);
@@ -256,7 +262,7 @@ export const NoiseDUI = () => {
                             min={0}
                             max={1}
                             step={0.01}
-                            onChange={(value) => controllerRef.current?.setRainVolume(value)}
+                            onChange={(value) => handleRainVolumeChange(value)}
                         />
                         <div className='w-82 sm:w-[400px]'>
                             <Equalizer
