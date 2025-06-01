@@ -2,7 +2,7 @@
 
 import { OscParam } from '../types/OscParam';
 import { AmpToggleSwitch } from './AmpToggleSwitch';
-import { Knob } from './Knob';
+import { CustomKnob as Knob } from './CustomKnob';
 import React from 'react';
 
 interface OscParamControllerProps {
@@ -42,6 +42,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
             step={step}
             label="Value"
             size={80}
+            trackWidth={0}
           />
         </div>
 
@@ -64,6 +65,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               label="Amp"
               size={50}
               disabled={!param.osc}
+              trackWidth={0}
             />
             <Knob
               value={param.freq}
@@ -74,6 +76,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               label="Freq"
               size={50}
               disabled={!param.osc}
+              trackWidth={0}
             />
           </div>
         </div>

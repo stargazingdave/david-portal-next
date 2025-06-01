@@ -3,7 +3,7 @@
 
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Equalizer } from './components/Equalizer';
-import { Knob } from './components/Knob';
+import { CustomKnob as Knob } from './components/CustomKnob';
 import Image from 'next/image';
 import { OscParam } from './types/OscParam';
 import { OscParamController } from './components/OscParamController';
@@ -62,7 +62,7 @@ export const NoiseDUI = () => {
     };
 
     const handleNoiseLevelChange = (value: number) => {
-        const updated = { ...params, noiseLevel: value };
+        const updated = { ...params, rainParams: { ...params.rainParams, noiseLevel: value } };
         setParams(updated);
         controllerRef.current?.setRainNoiseLevel(value);
     };
@@ -249,6 +249,12 @@ export const NoiseDUI = () => {
                                 freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
                                 onChange={handleEqChange}
                                 rotateLabels={-25}
+                                colors={{
+                                    background: "#1a1a1a",
+                                    Hz: "#eeeeee",
+                                    dB: "#bbbbbb",
+                                }}
+                                height={200}
                             />
                         </div>
                     </div>

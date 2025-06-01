@@ -1,9 +1,13 @@
 import { useRef, useEffect, useState, JSX } from "react";
 
 export type KnobColors = {
+    /** @type {string} @example "#ff0000" */
     body: string;
+    /** @type {string} */
     face: string;
+    /** @type {string} */
     indicator: string;
+    /** @type {string} */
     track: string;
 };
 
@@ -14,7 +18,7 @@ const defaultColors: KnobColors = {
     track: '#888',
 };
 
-interface KnobProps {
+export interface KnobProps {
     min?: number;
     max?: number;
     step?: number;
@@ -305,13 +309,18 @@ export const Knob = ({
                     strokeLinecap="round"
                 />
             </svg>
-            <div className="relative w-full flex flex-col items-center justify-between text-[10px]">
-                <div className="absolute flex justify-between w-full" style={{ top: -1 * size * 0.2 }}>
+
+            {/* Labels */}
+            <div className="relative flex flex-col items-center justify-between text-[10px]"
+                style={{ width: size + 8, height: size * 0.3 }}>
+                {/* Min/Max Labels */}
+                <div className="absolute flex justify-between w-full" style={{ top: -1 * size * 0.15 }}>
                     <span>{min}</span>
                     <span>{max}</span>
                 </div>
 
-                <div className="">
+                {/* Value Input */}
+                <div className="w-full flex justify-center">
                     <input
                         type="text"
                         inputMode="decimal"
@@ -348,7 +357,8 @@ export const Knob = ({
 
                             e.stopPropagation();
                         }}
-                        className="w-full max-w-[3.5rem] bg-transparent border-none text-xs text-amber-100 font-mono outline-none text-center"
+                        className="bg-transparent border-none text-xs text-amber-100 font-mono outline-none text-center"
+                        style={{ width: size }}
                     />
                 </div>
             </div>

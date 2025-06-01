@@ -9,7 +9,8 @@ export type EqualizerProps = {
     colors?: {
         bar?: string;
         background?: string;
-        label?: string;
+        Hz?: string;
+        dB?: string;
     };
     rotateLabels?: number;
     height?: number; // Optional height prop for future use
@@ -123,14 +124,17 @@ export const Equalizer: FC<EqualizerProps> = ({
                 display: 'grid',
                 gridTemplateColumns: `repeat(${gains.length + (showDbScale ? 1 : 0)}, 1fr)`,
                 gap: '0 4px',
-                height,
+                gridTemplateRows: `1fr auto`, // or `calc(${height}px - 20px) auto` if you need exact
+                height: height ? `${height}px` : "100%",
+
             }}
             ref={containerRef}
         >
-            {/* Db Scale */}
+            {/* dB Scale */}
             {
                 showDbScale &&
-                <div className="flex flex-col justify-between text-end text-xs text-gray-400 pr-2 h-full flex-shrink-0">
+                <div className="flex flex-col justify-between text-end text-xs pr-2 h-full flex-shrink-0"
+                    style={{ color: colors.dB || "#fff" }}>
                     {ticks.map((val, i) => (
                         <div key={i} className="whitespace-nowrap leading-none">
                             {val} dB
@@ -177,11 +181,17 @@ export const Equalizer: FC<EqualizerProps> = ({
                     className="h-full max-w-4 flex justify-center"
                 >
                     <div
-                        className={`bar-container ${colors.background || "bg-gray-800"} relative h-full w-4 rounded overflow-hidden`}
+                        className="bar-container relative h-full w-4 rounded overflow-hidden"
+                        style={{
+                            background: colors.background || "#333",
+                        }}
                     >
                         <div
-                            className={`${colors.bar || "bg-amber-400"} absolute bottom-0 w-full`}
-                            style={{ height }}
+                            className="absolute bottom-0 w-full"
+                            style={{
+                                height,
+                                background: colors.bar || "#de006b",
+                            }}
                         />
                     </div>
                 </div>;
@@ -191,7 +201,8 @@ export const Equalizer: FC<EqualizerProps> = ({
             {
                 showDbScale &&
                 <span
-                    className={`whitespace-nowrap text-xs text-end pr-2 ${colors.label || "text-white"}`}
+                    className="whitespace-nowrap text-xs text-end pb-0 mb-0 pr-2"
+                    style={{ color: colors.Hz || "#fff" }}
                 >
                     Hz
                 </span>
@@ -200,8 +211,12 @@ export const Equalizer: FC<EqualizerProps> = ({
             {freqs.map((freq, i) => (
                 <span
                     key={i}
-                    className={`h-fit max-w-4 pt-1 whitespace-nowrap text-xs text-center ${colors.label || "text-white"}`}
-                    style={rotateLabels ? { transform: `rotate(${rotateLabels}deg)`, transformOrigin: "center" } : undefined}
+                    className="max-w-4 pb-0 mb-0 pt-1 whitespace-nowrap text-xs text-center"
+                    style={{
+                        transform: rotateLabels ? `rotate(${rotateLabels}deg)` : undefined,
+                        transformOrigin: "center",
+                        color: colors.Hz || "#fff"
+                    }}
                 >
                     {formatFrequency(freq)}
                 </span>
