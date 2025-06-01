@@ -237,11 +237,14 @@ export const NoiseDUI = () => {
                             min={1000}
                             max={30000}
                         />
-                        <Equalizer
-                            gains={params.eqGains}
-                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                            onChange={handleEqChange}
-                        />
+                        <div className='w-82 sm:w-[400px]'>
+                            <Equalizer
+                                gains={params.eqGains}
+                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                                onChange={handleEqChange}
+                                rotateLabels={-25}
+                            />
+                        </div>
                     </div>
                 </Panel>
 
@@ -255,11 +258,14 @@ export const NoiseDUI = () => {
                             step={0.01}
                             onChange={(value) => controllerRef.current?.setRainVolume(value)}
                         />
-                        <Equalizer
-                            gains={params.rainParams.eqGains}
-                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                            onChange={(index, value) => handleRainEqChange(index, value)}
-                        />
+                        <div className='w-82 sm:w-[400px]'>
+                            <Equalizer
+                                gains={params.rainParams.eqGains}
+                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                                onChange={(index, value) => handleRainEqChange(index, value)}
+                                rotateLabels={-25}
+                            />
+                        </div>
                         <Section title='Noise'>
                             <div className='flex flex-wrap justify-around gap-4'>
                                 <Knob
@@ -390,11 +396,14 @@ export const NoiseDUI = () => {
                             distRange={[0, 0.5]}
                             step={0.01}
                         />
-                        <Equalizer
-                            gains={params.thunderParams.eqGains}
-                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                            onChange={(index, value) => handleThunderParamChange({ eqGains: params.thunderParams.eqGains.map((v, i) => (i === index ? value : v)) })}
-                        />
+                        <div className='w-82 sm:w-[400px]'>
+                            <Equalizer
+                                gains={params.thunderParams.eqGains}
+                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                                onChange={(index, value) => handleThunderParamChange({ eqGains: params.thunderParams.eqGains.map((v, i) => (i === index ? value : v)) })}
+                                rotateLabels={-25}
+                            />
+                        </div>
                         <Knob
                             label="Delay (time to start after rain)"
                             value={params.thunderParams.delayMs || 0}
