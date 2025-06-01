@@ -2,7 +2,7 @@
 
 import { RandParam } from '../types/RandParam';
 import { AmpToggleSwitch } from './AmpToggleSwitch';
-import { Knob } from './Knob';
+import { Knob } from './NewKnob';
 import React from 'react';
 
 interface RandParamControllerProps {
@@ -10,8 +10,7 @@ interface RandParamControllerProps {
   param: RandParam;
   onChange: (newParam: RandParam) => void;
   valueRange: [number, number];
-  ampRange?: [number, number];
-  freqRange?: [number, number];
+  distRange?: [number, number];
   step?: number;
 }
 
@@ -20,8 +19,7 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
   param,
   onChange,
   valueRange,
-  ampRange = [0, 1],
-  freqRange = [0.01, 100],
+  distRange = [0, 1],
   step = 0.01,
 }) => {
   const update = (updates: Partial<RandParam>) => {
@@ -57,11 +55,11 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
             <Knob
               value={param.dist}
               onChange={(val) => update({ dist: val })}
-              min={ampRange[0]}
-              max={ampRange[1]}
-              step={0.01}
+              min={distRange[0]}
+              max={distRange[1]}
+              step={step}
               label="Dist"
-              small
+              size={60}
               disabled={!param.rand}
             />
           </div>

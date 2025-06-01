@@ -387,7 +387,7 @@ export const NoiseDUI = () => {
                             param={params.thunderParams.volume}
                             onChange={(p) => handleThunderParamChange({ volume: p })}
                             valueRange={[0, 1]}
-                            ampRange={[0, 0.5]}
+                            distRange={[0, 0.5]}
                             step={0.01}
                         />
                         <Equalizer
@@ -409,7 +409,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.duration}
                                 onChange={(p) => handleThunderParamChange({ duration: p })}
                                 valueRange={[0, 10]}
-                                ampRange={[0, 5]}
+                                distRange={[0, 5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -417,7 +417,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.filterFreq}
                                 onChange={(p) => handleThunderParamChange({ filterFreq: p })}
                                 valueRange={[0, 3000]}
-                                ampRange={[0, 1000]}
+                                distRange={[0, 1000]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -425,7 +425,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.burstCount}
                                 onChange={(p) => handleThunderParamChange({ burstCount: p })}
                                 valueRange={[1, 10]}
-                                ampRange={[0, 1000]}
+                                distRange={[0, 5]}
                                 step={1}
                             />
                             <RandParamController
@@ -433,7 +433,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.reverbDuration}
                                 onChange={(p) => handleThunderParamChange({ reverbDuration: p })}
                                 valueRange={[0, 10]}
-                                ampRange={[0, 5]}
+                                distRange={[0, 5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -441,7 +441,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.reverbDecay}
                                 onChange={(p) => handleThunderParamChange({ reverbDecay: p })}
                                 valueRange={[0, 10]}
-                                ampRange={[0, 5]}
+                                distRange={[0, 5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -449,7 +449,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.reverbWetLevel}
                                 onChange={(p) => handleThunderParamChange({ reverbWetLevel: p })}
                                 valueRange={[0, 1]}
-                                ampRange={[0, 0.5]}
+                                distRange={[0, 0.5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -457,7 +457,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.subLevel}
                                 onChange={(p) => handleThunderParamChange({ subLevel: p })}
                                 valueRange={[0, 1]}
-                                ampRange={[0, 0.5]}
+                                distRange={[0, 0.5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -465,7 +465,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.panRange}
                                 onChange={(p) => handleThunderParamChange({ panRange: p })}
                                 valueRange={[0, 1]}
-                                ampRange={[0, 0.5]}
+                                distRange={[0, 0.5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -473,7 +473,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.highPassFreq}
                                 onChange={(p) => handleThunderParamChange({ highPassFreq: p })}
                                 valueRange={[20, 1000]}
-                                ampRange={[0, 500]}
+                                distRange={[0, 500]}
                                 step={10}
                             />
                             <RandParamController
@@ -481,7 +481,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.crackleAmount}
                                 onChange={(p) => handleThunderParamChange({ crackleAmount: p })}
                                 valueRange={[0, 1]}
-                                ampRange={[0, 0.5]}
+                                distRange={[0, 0.5]}
                                 step={0.01}
                             />
                         </div>
@@ -494,7 +494,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.rumbleFreqStart}
                                 onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
                                 valueRange={[20, 100]}
-                                ampRange={[0, 10]}
+                                distRange={[0, 10]}
                                 step={1}
                             />
                             <RandParamController
@@ -502,7 +502,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.rumbleFreqEnd}
                                 onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
                                 valueRange={[20, 1000]}
-                                ampRange={[0, 10]}
+                                distRange={[0, 10]}
                                 step={1}
                             />
                             <RandParamController
@@ -510,7 +510,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.rumbleVolume}
                                 onChange={(p) => handleThunderParamChange({ rumbleVolume: p })}
                                 valueRange={[0, 1]}
-                                ampRange={[0, 0.5]}
+                                distRange={[0, 0.5]}
                                 step={0.01}
                             />
                             <RandParamController
@@ -518,7 +518,7 @@ export const NoiseDUI = () => {
                                 param={params.thunderParams.rumbleDecay}
                                 onChange={(p) => handleThunderParamChange({ rumbleDecay: p })}
                                 valueRange={[0, 10]}
-                                ampRange={[0, 5]}
+                                distRange={[0, 5]}
                                 step={0.01}
                             />
                         </div>
@@ -659,7 +659,7 @@ const Instructions: FC = () => {
                     param={rand}
                     onChange={(p: RandParam) => setRand(p)}
                     valueRange={[0, 1]}
-                    ampRange={[0, 1]}
+                    distRange={[0, 1]}
                 />
                 <RandomBar param={rand} />
             </div>
