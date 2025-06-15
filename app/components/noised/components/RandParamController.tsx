@@ -27,8 +27,8 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
   };
 
   return (
-    <div className="h-fit flex flex-col gap-2 p-4 rounded bg-[#111] border border-[#333] font-[courier] shadow-inner">
-      <div className="text-[#aaa] font-bold">{label}</div>
+    <div className="h-fit flex flex-col gap-2 p-2">
+      <div className="font-bold">{label}</div>
 
       <div className='flex items-end gap-2'>
         <div className='flex flex-col items-center gap-2'>
@@ -42,13 +42,12 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
             size={80}
             colors={{
               face: '#de006b',
-              labels: '#fff',
             }}
           />
         </div>
 
         <div className="flex flex-col items-center gap-2 h-fit">
-          <div className='flex items-center gap-2 text-xs mt-1 text-[#ccc]'>
+          <div className='flex items-center gap-2 text-xs mt-1'>
             <AmpToggleSwitch
               checked={param.rand}
               onChange={(val) => update({ rand: val })}
@@ -69,7 +68,6 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
               disabled={!param.rand}
               colors={{
                 face: '#de006b',
-                labels: '#fff',
               }}
             />
           </div>

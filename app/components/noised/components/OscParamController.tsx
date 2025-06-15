@@ -29,7 +29,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
   };
 
   return (
-    <div className="h-fit flex flex-col gap-2">
+    <div className="h-fit flex flex-col gap-2 p-2">
       <div className="font-bold">{label}</div>
 
       <div className='h-fit flex items-end gap-4'>

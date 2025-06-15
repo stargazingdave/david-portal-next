@@ -247,7 +247,7 @@ export const NoiseDUI = () => {
                         min={1000}
                         max={30000}
                     />
-                    <div className='w-82 sm:w-[400px]'>
+                    <div className='w-82 sm:w-[420px]'>
                         <Equalizer
                             gains={params.eqGains}
                             freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
@@ -272,7 +272,7 @@ export const NoiseDUI = () => {
                             onChange={(value) => handleRainVolumeChange(value)}
                         />
                     </ControlContainer>
-                    <ControlContainer label="Rain EQ" width="430px" height="260px">
+                    <ControlContainer label="Rain EQ" width="465px" height="260px">
                         <Equalizer
                             gains={params.rainParams.eqGains}
                             freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
@@ -390,7 +390,7 @@ export const NoiseDUI = () => {
                         />
                     </ControlContainer>
                     <ControlContainer label="Drops Pitch" width="600px" height="260px">
-                        <div className='h-full w-full flex flex-wrap items-center justify-around'>
+                        <div className='h-full w-full flex items-center justify-around'>
                             <OscParamController
                                 label="Drop Min Pitch"
                                 param={params.rainParams.dropMinPitch}
@@ -414,16 +414,18 @@ export const NoiseDUI = () => {
             </Panel>
 
             <Panel title='Thunder Settings'>
-                <div className='flex flex-wrap gap-4 w-full justify-around'>
-                    <RandParamController
-                        label="Volume"
-                        param={params.thunderParams.volume}
-                        onChange={(p) => handleThunderParamChange({ volume: p })}
-                        valueRange={[0, 1]}
-                        distRange={[0, 0.5]}
-                        step={0.01}
-                    />
-                    <div className='w-82 sm:w-[400px]'>
+                <div className='relative flex flex-wrap items-start w-full min-w-0"'>
+                    <ControlContainer label="Thunder Volume" width="250px" height="260px">
+                        <RandParamController
+                            label="Volume"
+                            param={params.thunderParams.volume}
+                            onChange={(p) => handleThunderParamChange({ volume: p })}
+                            valueRange={[0, 1]}
+                            distRange={[0, 0.5]}
+                            step={0.01}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Thunder EQ" width="465px" height="260px">
                         <Equalizer
                             gains={params.thunderParams.eqGains}
                             freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
@@ -431,16 +433,8 @@ export const NoiseDUI = () => {
                             rotateLabels={-25}
                             colors={equalizerColors}
                         />
-                    </div>
-                    <Knob
-                        label="Delay (time to start after rain)"
-                        value={params.thunderParams.delayMs || 0}
-                        onChange={(value) => handleThunderParamChange({ delayMs: value })}
-                    />
-                </div>
-
-                <Section title='Bursts'>
-                    <div className='flex flex-wrap justify-around gap-4'>
+                    </ControlContainer>
+                    <ControlContainer label="Thunder Duration" width="250px" height="260px">
                         <RandParamController
                             label="Duration"
                             param={params.thunderParams.duration}
@@ -449,54 +443,8 @@ export const NoiseDUI = () => {
                             distRange={[0, 5]}
                             step={0.01}
                         />
-                        <RandParamController
-                            label="Filter Freq"
-                            param={params.thunderParams.filterFreq}
-                            onChange={(p) => handleThunderParamChange({ filterFreq: p })}
-                            valueRange={[0, 3000]}
-                            distRange={[0, 1000]}
-                            step={0.01}
-                        />
-                        <RandParamController
-                            label="Burst Count"
-                            param={params.thunderParams.burstCount}
-                            onChange={(p) => handleThunderParamChange({ burstCount: p })}
-                            valueRange={[1, 10]}
-                            distRange={[0, 5]}
-                            step={1}
-                        />
-                        <RandParamController
-                            label="Reverb Duration"
-                            param={params.thunderParams.reverbDuration}
-                            onChange={(p) => handleThunderParamChange({ reverbDuration: p })}
-                            valueRange={[0, 10]}
-                            distRange={[0, 5]}
-                            step={0.01}
-                        />
-                        <RandParamController
-                            label="Reverb Decay"
-                            param={params.thunderParams.reverbDecay}
-                            onChange={(p) => handleThunderParamChange({ reverbDecay: p })}
-                            valueRange={[0, 10]}
-                            distRange={[0, 5]}
-                            step={0.01}
-                        />
-                        <RandParamController
-                            label="Reverb Wet Level"
-                            param={params.thunderParams.reverbWetLevel}
-                            onChange={(p) => handleThunderParamChange({ reverbWetLevel: p })}
-                            valueRange={[0, 1]}
-                            distRange={[0, 0.5]}
-                            step={0.01}
-                        />
-                        <RandParamController
-                            label="Sub Level"
-                            param={params.thunderParams.subLevel}
-                            onChange={(p) => handleThunderParamChange({ subLevel: p })}
-                            valueRange={[0, 1]}
-                            distRange={[0, 0.5]}
-                            step={0.01}
-                        />
+                    </ControlContainer>
+                    <ControlContainer label="Panning" width="250px" height="260px">
                         <RandParamController
                             label="Pan Range"
                             param={params.thunderParams.panRange}
@@ -505,6 +453,58 @@ export const NoiseDUI = () => {
                             distRange={[0, 0.5]}
                             step={0.01}
                         />
+                    </ControlContainer>
+                    <ControlContainer label="Thunder Filter" width="250px" height="260px">
+                        <RandParamController
+                            label="Filter Freq"
+                            param={params.thunderParams.filterFreq}
+                            onChange={(p) => handleThunderParamChange({ filterFreq: p })}
+                            valueRange={[0, 3000]}
+                            distRange={[0, 1000]}
+                            step={0.01}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Bursts" width="250px" height="260px">
+                        <RandParamController
+                            label="Burst Count"
+                            param={params.thunderParams.burstCount}
+                            onChange={(p) => handleThunderParamChange({ burstCount: p })}
+                            valueRange={[1, 10]}
+                            distRange={[0, 5]}
+                            step={1}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Reverb" width="750px" height="260px">
+                        <div className='h-full w-full flex items-center justify-around'>
+                            <RandParamController
+                                label="Reverb Duration"
+                                param={params.thunderParams.reverbDuration}
+                                onChange={(p) => handleThunderParamChange({ reverbDuration: p })}
+                                valueRange={[0, 10]}
+                                distRange={[0, 5]}
+                                step={0.01}
+                            />
+                            <XSeparator />
+                            <RandParamController
+                                label="Reverb Decay"
+                                param={params.thunderParams.reverbDecay}
+                                onChange={(p) => handleThunderParamChange({ reverbDecay: p })}
+                                valueRange={[0, 10]}
+                                distRange={[0, 5]}
+                                step={0.01}
+                            />
+                            <XSeparator />
+                            <RandParamController
+                                label="Reverb Wet Level"
+                                param={params.thunderParams.reverbWetLevel}
+                                onChange={(p) => handleThunderParamChange({ reverbWetLevel: p })}
+                                valueRange={[0, 1]}
+                                distRange={[0, 0.5]}
+                                step={0.01}
+                            />
+                        </div>
+                    </ControlContainer>
+                    <ControlContainer label="Filter" width="250px" height="260px">
                         <RandParamController
                             label="High Pass Freq"
                             param={params.thunderParams.highPassFreq}
@@ -513,6 +513,8 @@ export const NoiseDUI = () => {
                             distRange={[0, 500]}
                             step={10}
                         />
+                    </ControlContainer>
+                    <ControlContainer label="Crackle" width="250px" height="260px">
                         <RandParamController
                             label="Crackle Amount"
                             param={params.thunderParams.crackleAmount}
@@ -521,45 +523,47 @@ export const NoiseDUI = () => {
                             distRange={[0, 0.5]}
                             step={0.01}
                         />
-                    </div>
-                </Section>
-
-                <Section title='Rumble'>
-                    <div className='flex flex-wrap justify-around gap-4'>
-                        <RandParamController
-                            label="Rumble Freq Start"
-                            param={params.thunderParams.rumbleFreqStart}
-                            onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
-                            valueRange={[20, 100]}
-                            distRange={[0, 10]}
-                            step={1}
-                        />
-                        <RandParamController
-                            label="Rumble Freq End"
-                            param={params.thunderParams.rumbleFreqEnd}
-                            onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
-                            valueRange={[20, 1000]}
-                            distRange={[0, 10]}
-                            step={1}
-                        />
-                        <RandParamController
-                            label="Rumble Volume"
-                            param={params.thunderParams.rumbleVolume}
-                            onChange={(p) => handleThunderParamChange({ rumbleVolume: p })}
-                            valueRange={[0, 1]}
-                            distRange={[0, 0.5]}
-                            step={0.01}
-                        />
-                        <RandParamController
-                            label="Rumble Decay"
-                            param={params.thunderParams.rumbleDecay}
-                            onChange={(p) => handleThunderParamChange({ rumbleDecay: p })}
-                            valueRange={[0, 10]}
-                            distRange={[0, 5]}
-                            step={0.01}
-                        />
-                    </div>
-                </Section>
+                    </ControlContainer>
+                    <ControlContainer label="Rumble" width="1000px" height="260px">
+                        <div className='h-full w-full flex items-center justify-around'>
+                            <RandParamController
+                                label="Rumble Freq Start"
+                                param={params.thunderParams.rumbleFreqStart}
+                                onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
+                                valueRange={[20, 100]}
+                                distRange={[0, 10]}
+                                step={1}
+                            />
+                            <XSeparator />
+                            <RandParamController
+                                label="Rumble Freq End"
+                                param={params.thunderParams.rumbleFreqEnd}
+                                onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
+                                valueRange={[20, 1000]}
+                                distRange={[0, 10]}
+                                step={1}
+                            />
+                            <XSeparator />
+                            <RandParamController
+                                label="Rumble Volume"
+                                param={params.thunderParams.rumbleVolume}
+                                onChange={(p) => handleThunderParamChange({ rumbleVolume: p })}
+                                valueRange={[0, 1]}
+                                distRange={[0, 0.5]}
+                                step={0.01}
+                            />
+                            <XSeparator />
+                            <RandParamController
+                                label="Rumble Decay"
+                                param={params.thunderParams.rumbleDecay}
+                                onChange={(p) => handleThunderParamChange({ rumbleDecay: p })}
+                                valueRange={[0, 10]}
+                                distRange={[0, 5]}
+                                step={0.01}
+                            />
+                        </div>
+                    </ControlContainer>
+                </div>
             </Panel>
         </div>
     </div>;
@@ -625,18 +629,25 @@ const Section: FC<{
 const ControlContainer: FC<{
     label: string;
     width?: string;
-    height?: string;
+    height: string;
     children?: React.ReactNode;
 }> = ({ label, children, width, height }) => {
     return (
-        <div className="flex flex-col items-center shadow-inner border border-neutral-500/30 overflow-hidden" style={{ width, height }}>
+        <div
+            className="relative flex flex-col grow items-center shadow-inner border border-neutral-500/30 overflow-hidden"
+            style={{
+                flexBasis: width, // Suggested width
+                maxWidth: "100%", // Never overflow parent
+                height
+            }}
+        >
             <label className="w-full p-1 font-medium bg-neutral-600 text-white">{label}</label>
-            <div className="w-full h-full flex items-center justify-center divide-x-2 divide-neutral-500/30">
+            <div className="w-full h-full flex items-center justify-center overflow-x-auto">
                 {children}
             </div>
         </div>
     );
-}
+};
 
 const Select: FC<{
     value: string;
@@ -770,5 +781,16 @@ const Instructions: FC = () => {
 }
 
 const XSeparator: FC = () => {
-    return <div className='w-[1px] h-full bg-neutral-500/30' />;
-}
+    return (
+        <div
+            className="bg-neutral-500/30"
+            style={{
+                width: '1px',
+                minWidth: '1px',
+                height: '100%',
+                flexShrink: 0,
+                flexGrow: 0,
+            }}
+        />
+    );
+};
