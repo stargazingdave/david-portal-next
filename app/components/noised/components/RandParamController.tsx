@@ -3,7 +3,14 @@
 import { RandParam } from '../types/RandParam';
 import { AmpToggleSwitch } from './AmpToggleSwitch';
 import { CustomKnob as Knob } from './CustomKnob';
-import React from 'react';
+import React, { FC, useState } from 'react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { IoHelp } from 'react-icons/io5';
+import { RandomBar } from './demos/RandomBar';
 
 interface RandParamControllerProps {
   label: React.ReactNode;
@@ -12,6 +19,7 @@ interface RandParamControllerProps {
   valueRange: [number, number];
   distRange?: [number, number];
   step?: number;
+  tooltipText?: string;
 }
 
 export const RandParamController: React.FC<RandParamControllerProps> = ({
@@ -21,6 +29,7 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
   valueRange,
   distRange = [0, 1],
   step = 0.01,
+  tooltipText
 }) => {
   const update = (updates: Partial<RandParam>) => {
     onChange({ ...param, ...updates });
@@ -28,7 +37,24 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
 
   return (
     <div className="h-fit flex flex-col gap-2 p-2">
-      <div className="font-bold">{label}</div>
+      <div className="flex items-center gap-2 font-bold">
+        <Popover>
+          <PopoverTrigger asChild>
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-white bg-neutral-500 hover:bg-neutral-600 cursor-default">
+              <IoHelp className="w-4 h-4" />
+            </span>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="z-50 w-72 sm:w-lg max-w-full text-sm">
+            {
+              tooltipText && <>
+                <p>{tooltipText}</p>
+                <br /></>
+            }
+            <Instructions />
+          </PopoverContent>
+        </Popover>
+        {label}
+      </div>
 
       <div className='flex items-end gap-2'>
         <div className='flex flex-col items-center gap-2'>
@@ -76,3 +102,31 @@ export const RandParamController: React.FC<RandParamControllerProps> = ({
     </div>
   );
 };
+
+const Instructions: FC = () => {
+  const [rand, setRand] = useState<RandParam>({
+    dist: 0.1,
+    rand: true,
+    value: 0.5,
+  });
+
+  return <div className='w-full h-full flex flex-col justify-between gap-8'>
+    <div className='max-w-[28rem] text-sm text-neutral-500'>
+      <h1 className='font-bold text-2xl'>Random Parameter Controller</h1>
+      <p>You can toggle between a fixed value and a random value.</p>
+      <p>Adjust the <span className='font-bold'>Dist</span> to control how much variation there is around the set value.</p>
+    </div>
+    <div className='w-fit flex flex-wrap gap-4'>
+      <RandParamController
+        label="Random"
+        param={rand}
+        onChange={(p: RandParam) => setRand(p)}
+        valueRange={[0, 1]}
+        distRange={[0, 1]}
+      />
+      <div className='h-auto w-52'>
+        <RandomBar param={rand} />
+      </div>
+    </div>
+  </div>;
+}
