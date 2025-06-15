@@ -2,7 +2,7 @@
 
 import { OscParam } from '../types/OscParam';
 import { AmpToggleSwitch } from './AmpToggleSwitch';
-import { CustomKnob as Knob } from './CustomKnob';
+import { Knob } from './Knob';
 import React from 'react';
 
 interface OscParamControllerProps {
@@ -29,11 +29,11 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
   };
 
   return (
-    <div className="flex flex-col justify-around gap-2 p-4 rounded bg-[#111] border border-[#333] font-[courier] shadow-inner">
-      <div className="text-[#aaa]">{label}</div>
+    <div className="h-fit flex flex-col gap-2">
+      <div className="font-bold">{label}</div>
 
-      <div className='flex items-end gap-4'>
-        <div className='flex flex-col items-center gap-2'>
+      <div className='h-fit flex items-end gap-4'>
+        <div className='h-full flex flex-col items-center gap-2'>
           <Knob
             value={param.value}
             onChange={(val) => update({ value: val })}
@@ -43,11 +43,14 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
             label="Value"
             size={80}
             trackWidth={0}
+            colors={{
+              face: '#de006b',
+            }}
           />
         </div>
 
-        <div className="flex flex-col items-center gap-2 h-full">
-          <div className='flex items-center gap-2 text-xs mt-1 text-[#ccc]'>
+        <div className="flex flex-col items-center gap-2 h-fit">
+          <div className='flex items-center gap-2 text-xs mt-1'>
             <AmpToggleSwitch
               checked={param.osc}
               onChange={(val) => update({ osc: val })}
@@ -55,7 +58,7 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
             />
             <div className={`w-2 h-2 rounded-full border border-[#222] shadow-sm transition-all duration-300 ${param.osc ? 'bg-red-500 shadow-[0_0_6px_#f00a]' : 'bg-[#220000]'}`} />
           </div>
-          <div className="flex gap-4 items-center justify-center">
+          <div className="flex gap-4">
             <Knob
               value={param.amp}
               onChange={(val) => update({ amp: val })}
@@ -66,6 +69,9 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               size={50}
               disabled={!param.osc}
               trackWidth={0}
+              colors={{
+                face: '#de006b',
+              }}
             />
             <Knob
               value={param.freq}
@@ -77,6 +83,9 @@ export const OscParamController: React.FC<OscParamControllerProps> = ({
               size={50}
               disabled={!param.osc}
               trackWidth={0}
+              colors={{
+                face: '#de006b',
+              }}
             />
           </div>
         </div>

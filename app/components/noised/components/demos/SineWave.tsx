@@ -33,7 +33,7 @@ export const SineWave: React.FC<{ param: OscParam }> = ({ param }) => {
             points.forEach(p => ctx.lineTo(p.x, p.y));
             ctx.lineTo(width, height);
             ctx.closePath();
-            ctx.fillStyle = 'lime';
+            ctx.fillStyle = '#de006b';
             ctx.fill();
 
             requestAnimationFrame(draw);
@@ -43,7 +43,7 @@ export const SineWave: React.FC<{ param: OscParam }> = ({ param }) => {
     }, [param, size]);
 
     return (
-        <div ref={containerRef} style={{ width: '100%' }}>
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
             <canvas ref={canvasRef} />
         </div>
     );

@@ -121,6 +121,7 @@ export const Equalizer: FC<EqualizerProps> = ({
     return (
         <div
             style={{
+                width: '100%',
                 display: 'grid',
                 gridTemplateColumns: `repeat(${gains.length + (showDbScale ? 1 : 0)}, 1fr)`,
                 gap: '0 4px',

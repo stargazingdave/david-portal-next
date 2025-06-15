@@ -30,8 +30,8 @@ const getCodeProjects = (): CodeProject[] => {
             description:
                 'A JavaScript library for generating background noise like rain and thunders.',
             image: {
-                light: '/images/dnoise-logo-light.png',
-                dark: '/images/dnoise-logo-dark.png',
+                light: '/images/noised-logo-icon.png',
+                dark: '/images/noised-logo-icon.png',
             },
             links: {
                 demo: '/weather_synth',

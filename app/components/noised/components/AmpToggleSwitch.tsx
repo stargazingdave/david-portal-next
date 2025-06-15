@@ -12,7 +12,7 @@ export const AmpToggleSwitch = ({
     disabled?: boolean;
 }) => {
     return (
-        <div className="flex items-center gap-2 text-xs text-[#ccc] select-none">
+        <div className="flex items-center gap-2 text-xs select-none">
             {label && <span className="mb-1">{label}</span>}
             <div
                 onClick={() => !disabled && onChange(!checked)}

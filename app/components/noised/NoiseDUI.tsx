@@ -15,14 +15,15 @@ import { SineWave } from './components/demos/SineWave';
 import { RandomBar } from './components/demos/RandomBar';
 import { RandParam } from './types/RandParam';
 import { Tooltip } from '../Tooltip';
+import { useTheme } from '@/app/contexts/ThemeProvider';
 
 export const NoiseDUI = () => {
+    const { theme } = useTheme();
     const audioCtxRef = useRef<AudioContext | null>(null);
     const controllerRef = useRef<NoiseDController | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [params, setParams] = useState<NoiseDParams>(_defaultNoiseDParams);
     const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
-    const [showInstructions, setShowInstructions] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -175,93 +176,93 @@ export const NoiseDUI = () => {
         URL.revokeObjectURL(url);
     };
 
-    return <div className="flex flex-col items-center w-full h-fit p-8">
-        <div className="w-full p-4 bg-cover border border-gray-800 rounded-lg shadow-lg shadow-gray-700/50 text-white">
-            <div className="relative flex flex-wrap items-center justify-around mb-4">
-                <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded-lg z-0 pointer-events-none">
-                    <Visualization
-                        analyserRef={{ current: analyserNode }}
-                        isPlaying={isRunning}
-                        type="waveform"
-                        barCount={48}
-                    />
-                </div>
+    const equalizerColors = theme === 'dark'
+        ? {
+            background: "#1a1a1a",
+            Hz: "#fff",
+            dB: "#fff",
+        }
+        : {
+            background: "#fff",
+            Hz: "#000",
+            dB: "#000",
+        };
 
-                {/* Foreground elements */}
-                <Image
-                    src="/images/dnoise-logo-dark.png"
-                    width={100}
-                    height={100}
-                    alt="NoiseD"
-                    className="z-10"
+    return <div className="w-full">
+        <div className="relative flex flex-wrap items-center justify-around mb-4">
+            <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded-lg z-0 pointer-events-none">
+                <Visualization
+                    analyserRef={{ current: analyserNode }}
+                    isPlaying={isRunning}
+                    type="waveform"
+                    barCount={48}
                 />
-
-                <button
-                    onClick={toggle}
-                    className="h-fit flex text-white font-bold py-2 px-4 rounded-full bg-amber-500 hover:bg-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
-                    title={isRunning ? "Stop" : "Start"}
-                >
-                    {isRunning ? "Silence!" : "Start the Noise!"}
-                </button>
-                <Tooltip content="Download a JSON file with the current parameters" placement="top">
-                    <button
-                        onClick={handleDownloadParams}
-                        className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
-                        title="Download Params"
-                    >
-                        <IoDownload size={50} />
-                    </button>
-                </Tooltip>
             </div>
-            <div className="space-y-6 mt-6">
-                <Panel title={<div className='flex items-center gap-2'>
-                    <span>Instructions</span>
-                    <button
-                        onClick={() => setShowInstructions(!showInstructions)}
-                        className="text-amber-500 font-bold p-2 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer"
-                        title={showInstructions ? "Hide Instructions" : "Show Instructions"}
-                    >
-                        {showInstructions ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
-                    </button>
-                </div>}>
-                    {showInstructions && <Instructions />}
-                </Panel>
-                <Panel title='Master'>
-                    <div className='flex flex-wrap items-center justify-around gap-4'>
-                        <Knob
-                            label="Volume"
-                            value={params.masterVolume}
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            onChange={handleVolumeChange}
-                        />
-                        <MinMaxPair
-                            label="Delay Between Thunders"
-                            range={params.delayBetweenThunders}
-                            onChange={(type, value) => handleDelayBetweenThundersChange(type, value)}
-                            min={1000}
-                            max={30000}
-                        />
-                        <div className='w-82 sm:w-[400px]'>
-                            <Equalizer
-                                gains={params.eqGains}
-                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                                onChange={handleEqChange}
-                                rotateLabels={-25}
-                                colors={{
-                                    background: "#1a1a1a",
-                                    Hz: "#eeeeee",
-                                    dB: "#bbbbbb",
-                                }}
-                                height={200}
-                            />
-                        </div>
-                    </div>
-                </Panel>
 
-                <Panel title='Rain Settings'>
-                    <div className='flex flex-wrap items-center justify-around gap-4'>
+            {/* Foreground elements */}
+            <div className="relative w-72 h-28 flex-shrink-0 z-10">
+                <Image
+                    src="/images/noised-logo-full.png"
+                    alt="NoiseD Logo"
+                    fill
+                    className="object-contain object-bottom"
+                />
+            </div>
+
+            <button
+                onClick={toggle}
+                className="h-fit flex text-white font-bold py-2 px-4 rounded-full bg-amber-500 hover:bg-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                title={isRunning ? "Stop" : "Start"}
+            >
+                {isRunning ? "Silence!" : "Start the Noise!"}
+            </button>
+            <Tooltip content="Download a JSON file with the current parameters" placement="top">
+                <button
+                    onClick={handleDownloadParams}
+                    className="text-amber-500 font-bold p-4 rounded-full hover:text-amber-300 transition duration-300 ease-in-out cursor-pointer z-10"
+                    title="Download Params"
+                >
+                    <IoDownload size={50} />
+                </button>
+            </Tooltip>
+        </div>
+        <div className="space-y-6">
+            <Panel title="Instructions" openInit={true}>
+                <Instructions />
+            </Panel>
+            <Panel title='Master'>
+                <div className='flex flex-wrap items-center justify-around gap-4'>
+                    <Knob
+                        label="Volume"
+                        value={params.masterVolume}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        onChange={handleVolumeChange}
+                    />
+                    <MinMaxPair
+                        label="Delay Between Thunders"
+                        range={params.delayBetweenThunders}
+                        onChange={(type, value) => handleDelayBetweenThundersChange(type, value)}
+                        min={1000}
+                        max={30000}
+                    />
+                    <div className='w-82 sm:w-[400px]'>
+                        <Equalizer
+                            gains={params.eqGains}
+                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                            onChange={handleEqChange}
+                            rotateLabels={-25}
+                            colors={equalizerColors}
+                            height={200}
+                        />
+                    </div>
+                </div>
+            </Panel>
+
+            <Panel title='Rain Settings'>
+                <div className='relative flex flex-wrap items-start w-full min-w-0"'>
+                    <ControlContainer label="Rain Volume" width="150px" height="260px">
                         <Knob
                             label="Volume"
                             value={params.rainParams.volume}
@@ -270,32 +271,39 @@ export const NoiseDUI = () => {
                             step={0.01}
                             onChange={(value) => handleRainVolumeChange(value)}
                         />
-                        <div className='w-82 sm:w-[400px]'>
-                            <Equalizer
-                                gains={params.rainParams.eqGains}
-                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                                onChange={(index, value) => handleRainEqChange(index, value)}
-                                rotateLabels={-25}
-                            />
-                        </div>
-                        <Section title='Noise'>
-                            <div className='flex flex-wrap justify-around gap-4'>
-                                <Knob
-                                    label="Noise Level"
-                                    value={params.rainParams.noiseLevel}
-                                    min={0}
-                                    max={1}
-                                    step={0.01}
-                                    onChange={(value) => handleNoiseLevelChange(value)}
-                                />
-                                <div className='flex flex-col gap-2'>
-                                    <label className="text-sm">Noise Type</label>
+                    </ControlContainer>
+                    <ControlContainer label="Rain EQ" width="430px" height="260px">
+                        <Equalizer
+                            gains={params.rainParams.eqGains}
+                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                            onChange={(index, value) => handleRainEqChange(index, value)}
+                            rotateLabels={-25}
+                            colors={equalizerColors}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Background Noise" width="480px" height="260px">
+                        <div className='w-full h-full flex items-center justify-around'>
+                            <div className='h-full flex flex-col grow items-center justify-around p-2'>
+                                <div className='w-full flex flex-col gap-2'>
+                                    <label className="text-sm font-bold">Noise Type</label>
                                     <Select
                                         value={params.rainParams.noiseType}
                                         onChange={(value) => handleNoiseTypeChange(value as NoiseType)}
                                         options={['white', 'pink']}
                                     />
                                 </div>
+                                <Knob
+                                    label="Noise Level"
+                                    size={80}
+                                    value={params.rainParams.noiseLevel}
+                                    min={0}
+                                    max={1}
+                                    step={0.01}
+                                    onChange={(value) => handleNoiseLevelChange(value)}
+                                />
+                            </div>
+                            <XSeparator />
+                            <div className='h-full flex flex-col grow items-center justify-center'>
                                 <OscParamController
                                     label="Noise Filter Freq"
                                     param={params.rainParams.noiseFilterFreq}
@@ -306,257 +314,292 @@ export const NoiseDUI = () => {
                                     step={0.01}
                                 />
                             </div>
-                        </Section>
-                    </div>
-
-                    <Section title='Drops'>
-                        <div className='relative flex flex-wrap justify-around items-start w-full gap-4'>
-                            <div className='flex flex-col h-auto gap-8'>
-                                <div className='flex gap-4'>
-                                    <Knob
-                                        label="Dry Level"
-                                        value={params.rainParams.dropDryLevel}
-                                        min={0}
-                                        max={1}
-                                        step={0.01}
-                                        onChange={(value) => handleRainDropDryLevelChange(value)}
-                                    />
-                                    <Knob
-                                        label="Wet Level"
-                                        value={params.rainParams.dropWetLevel}
-                                        min={0}
-                                        max={1}
-                                        step={0.01}
-                                        onChange={(value) => handleRainDropWetLevelChange(value)}
-                                    />
-                                </div>
-                                <div className='flex gap-4'>
-                                    <Knob
-                                        label="Q"
-                                        value={params.rainParams.dropQ}
-                                        onChange={(value) => handleRainDropQChange(value)}
-                                        min={0}
-                                        max={5}
-                                        step={0.1}
-                                    />
-                                    <Knob
-                                        label="Rate"
-                                        value={params.rainParams.dropRate}
-                                        onChange={(value) => handleRainDropRateChange(value)}
-                                        min={0.1}
-                                        max={200}
-                                        step={0.1}
-                                    />
-                                </div>
-                                <Knob
-                                    label="Decay Time"
-                                    value={params.rainParams.dropDecayTime}
-                                    onChange={(value) => handleRainDropDecayTimeChange(value)}
-                                    min={0.01}
-                                    max={1}
-                                    step={0.01}
-                                />
-                            </div>
-
-                            <div className='flex flex-wrap justify-around gap-4 max-w-3/4'>
-                                <OscParamController
-                                    label="Reverb Level"
-                                    param={params.rainParams.dropReverbLevel}
-                                    onChange={(p: OscParam) => handleRainDropReverbLevelChange(p)}
-                                    valueRange={[0, 1]}
-                                    ampRange={[0, 1]}
-                                    freqRange={[0, 1]}
-                                    step={0.01}
-                                />
-                                <OscParamController
-                                    label="Pan Range"
-                                    param={params.rainParams.dropPanRange}
-                                    onChange={(p) => handleRainDropPanRangeChange(p)}
-                                    valueRange={[0, 1]}
-                                    ampRange={[0, 1]}
-                                    freqRange={[0, 5]}
-                                    step={0.01}
-                                />
-                                <OscParamController
-                                    label="Drop Min Pitch"
-                                    param={params.rainParams.dropMinPitch}
-                                    onChange={(p) => handleRainDropMinPitchChange(p)}
-                                    valueRange={[20, 8000]}
-                                    ampRange={[0, 1000]}
-                                    step={10}
-                                />
-                                <OscParamController
-                                    label="Drop Max Pitch"
-                                    param={params.rainParams.dropMaxPitch}
-                                    onChange={(p) => handleRainDropMaxPitchChange(p)}
-                                    valueRange={[20, 8000]}
-                                    ampRange={[0, 1000]}
-                                    step={1}
-                                />
-                            </div>
                         </div>
-                    </Section>
-                </Panel>
+                    </ControlContainer>
+                    <ControlContainer label="Drops Level" width="300px" height="260px">
+                        <div className='h-full w-full flex items-center justify-around'>
+                            <Knob
+                                label="Dry Level"
+                                value={params.rainParams.dropDryLevel}
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                onChange={(value) => handleRainDropDryLevelChange(value)}
+                            />
+                            <XSeparator />
+                            <Knob
+                                label="Wet Level"
+                                value={params.rainParams.dropWetLevel}
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                onChange={(value) => handleRainDropWetLevelChange(value)}
+                            />
+                        </div>
+                    </ControlContainer>
+                    <ControlContainer label="Drops Resonance" width="160px" height="260px">
+                        <Knob
+                            label="Q"
+                            value={params.rainParams.dropQ}
+                            onChange={(value) => handleRainDropQChange(value)}
+                            min={0}
+                            max={5}
+                            step={0.1}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Drops Rate" width="150px" height="260px">
+                        <Knob
+                            label="Rate"
+                            value={params.rainParams.dropRate}
+                            onChange={(value) => handleRainDropRateChange(value)}
+                            min={0.1}
+                            max={200}
+                            step={0.1}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Drops Decay" width="150px" height="260px">
+                        <Knob
+                            label="Decay Time"
+                            value={params.rainParams.dropDecayTime}
+                            onChange={(value) => handleRainDropDecayTimeChange(value)}
+                            min={0.01}
+                            max={1}
+                            step={0.01}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Reverb" width="300px" height="260px">
+                        <OscParamController
+                            label="Reverb Level"
+                            param={params.rainParams.dropReverbLevel}
+                            onChange={(p: OscParam) => handleRainDropReverbLevelChange(p)}
+                            valueRange={[0, 1]}
+                            ampRange={[0, 1]}
+                            freqRange={[0, 1]}
+                            step={0.01}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Drops Panning" width="300px" height="260px">
+                        <OscParamController
+                            label="Pan Range"
+                            param={params.rainParams.dropPanRange}
+                            onChange={(p) => handleRainDropPanRangeChange(p)}
+                            valueRange={[0, 1]}
+                            ampRange={[0, 1]}
+                            freqRange={[0, 5]}
+                            step={0.01}
+                        />
+                    </ControlContainer>
+                    <ControlContainer label="Drops Pitch" width="600px" height="260px">
+                        <div className='h-full w-full flex flex-wrap items-center justify-around'>
+                            <OscParamController
+                                label="Drop Min Pitch"
+                                param={params.rainParams.dropMinPitch}
+                                onChange={(p) => handleRainDropMinPitchChange(p)}
+                                valueRange={[20, 8000]}
+                                ampRange={[0, 1000]}
+                                step={10}
+                            />
+                            <XSeparator />
+                            <OscParamController
+                                label="Drop Max Pitch"
+                                param={params.rainParams.dropMaxPitch}
+                                onChange={(p) => handleRainDropMaxPitchChange(p)}
+                                valueRange={[20, 8000]}
+                                ampRange={[0, 1000]}
+                                step={1}
+                            />
+                        </div>
+                    </ControlContainer>
+                </div>
+            </Panel>
 
-                <Panel title='Thunder Settings'>
-                    <div className='flex flex-wrap gap-4 w-full justify-around'>
+            <Panel title='Thunder Settings'>
+                <div className='flex flex-wrap gap-4 w-full justify-around'>
+                    <RandParamController
+                        label="Volume"
+                        param={params.thunderParams.volume}
+                        onChange={(p) => handleThunderParamChange({ volume: p })}
+                        valueRange={[0, 1]}
+                        distRange={[0, 0.5]}
+                        step={0.01}
+                    />
+                    <div className='w-82 sm:w-[400px]'>
+                        <Equalizer
+                            gains={params.thunderParams.eqGains}
+                            freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
+                            onChange={(index, value) => handleThunderParamChange({ eqGains: params.thunderParams.eqGains.map((v, i) => (i === index ? value : v)) })}
+                            rotateLabels={-25}
+                            colors={equalizerColors}
+                        />
+                    </div>
+                    <Knob
+                        label="Delay (time to start after rain)"
+                        value={params.thunderParams.delayMs || 0}
+                        onChange={(value) => handleThunderParamChange({ delayMs: value })}
+                    />
+                </div>
+
+                <Section title='Bursts'>
+                    <div className='flex flex-wrap justify-around gap-4'>
                         <RandParamController
-                            label="Volume"
-                            param={params.thunderParams.volume}
-                            onChange={(p) => handleThunderParamChange({ volume: p })}
+                            label="Duration"
+                            param={params.thunderParams.duration}
+                            onChange={(p) => handleThunderParamChange({ duration: p })}
+                            valueRange={[0, 10]}
+                            distRange={[0, 5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Filter Freq"
+                            param={params.thunderParams.filterFreq}
+                            onChange={(p) => handleThunderParamChange({ filterFreq: p })}
+                            valueRange={[0, 3000]}
+                            distRange={[0, 1000]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Burst Count"
+                            param={params.thunderParams.burstCount}
+                            onChange={(p) => handleThunderParamChange({ burstCount: p })}
+                            valueRange={[1, 10]}
+                            distRange={[0, 5]}
+                            step={1}
+                        />
+                        <RandParamController
+                            label="Reverb Duration"
+                            param={params.thunderParams.reverbDuration}
+                            onChange={(p) => handleThunderParamChange({ reverbDuration: p })}
+                            valueRange={[0, 10]}
+                            distRange={[0, 5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Reverb Decay"
+                            param={params.thunderParams.reverbDecay}
+                            onChange={(p) => handleThunderParamChange({ reverbDecay: p })}
+                            valueRange={[0, 10]}
+                            distRange={[0, 5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Reverb Wet Level"
+                            param={params.thunderParams.reverbWetLevel}
+                            onChange={(p) => handleThunderParamChange({ reverbWetLevel: p })}
                             valueRange={[0, 1]}
                             distRange={[0, 0.5]}
                             step={0.01}
                         />
-                        <div className='w-82 sm:w-[400px]'>
-                            <Equalizer
-                                gains={params.thunderParams.eqGains}
-                                freqs={[31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]}
-                                onChange={(index, value) => handleThunderParamChange({ eqGains: params.thunderParams.eqGains.map((v, i) => (i === index ? value : v)) })}
-                                rotateLabels={-25}
-                            />
-                        </div>
-                        <Knob
-                            label="Delay (time to start after rain)"
-                            value={params.thunderParams.delayMs || 0}
-                            onChange={(value) => handleThunderParamChange({ delayMs: value })}
+                        <RandParamController
+                            label="Sub Level"
+                            param={params.thunderParams.subLevel}
+                            onChange={(p) => handleThunderParamChange({ subLevel: p })}
+                            valueRange={[0, 1]}
+                            distRange={[0, 0.5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Pan Range"
+                            param={params.thunderParams.panRange}
+                            onChange={(p) => handleThunderParamChange({ panRange: p })}
+                            valueRange={[0, 1]}
+                            distRange={[0, 0.5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="High Pass Freq"
+                            param={params.thunderParams.highPassFreq}
+                            onChange={(p) => handleThunderParamChange({ highPassFreq: p })}
+                            valueRange={[20, 1000]}
+                            distRange={[0, 500]}
+                            step={10}
+                        />
+                        <RandParamController
+                            label="Crackle Amount"
+                            param={params.thunderParams.crackleAmount}
+                            onChange={(p) => handleThunderParamChange({ crackleAmount: p })}
+                            valueRange={[0, 1]}
+                            distRange={[0, 0.5]}
+                            step={0.01}
                         />
                     </div>
+                </Section>
 
-                    <Section title='Bursts'>
-                        <div className='flex flex-wrap justify-around gap-4'>
-                            <RandParamController
-                                label="Duration"
-                                param={params.thunderParams.duration}
-                                onChange={(p) => handleThunderParamChange({ duration: p })}
-                                valueRange={[0, 10]}
-                                distRange={[0, 5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Filter Freq"
-                                param={params.thunderParams.filterFreq}
-                                onChange={(p) => handleThunderParamChange({ filterFreq: p })}
-                                valueRange={[0, 3000]}
-                                distRange={[0, 1000]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Burst Count"
-                                param={params.thunderParams.burstCount}
-                                onChange={(p) => handleThunderParamChange({ burstCount: p })}
-                                valueRange={[1, 10]}
-                                distRange={[0, 5]}
-                                step={1}
-                            />
-                            <RandParamController
-                                label="Reverb Duration"
-                                param={params.thunderParams.reverbDuration}
-                                onChange={(p) => handleThunderParamChange({ reverbDuration: p })}
-                                valueRange={[0, 10]}
-                                distRange={[0, 5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Reverb Decay"
-                                param={params.thunderParams.reverbDecay}
-                                onChange={(p) => handleThunderParamChange({ reverbDecay: p })}
-                                valueRange={[0, 10]}
-                                distRange={[0, 5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Reverb Wet Level"
-                                param={params.thunderParams.reverbWetLevel}
-                                onChange={(p) => handleThunderParamChange({ reverbWetLevel: p })}
-                                valueRange={[0, 1]}
-                                distRange={[0, 0.5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Sub Level"
-                                param={params.thunderParams.subLevel}
-                                onChange={(p) => handleThunderParamChange({ subLevel: p })}
-                                valueRange={[0, 1]}
-                                distRange={[0, 0.5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Pan Range"
-                                param={params.thunderParams.panRange}
-                                onChange={(p) => handleThunderParamChange({ panRange: p })}
-                                valueRange={[0, 1]}
-                                distRange={[0, 0.5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="High Pass Freq"
-                                param={params.thunderParams.highPassFreq}
-                                onChange={(p) => handleThunderParamChange({ highPassFreq: p })}
-                                valueRange={[20, 1000]}
-                                distRange={[0, 500]}
-                                step={10}
-                            />
-                            <RandParamController
-                                label="Crackle Amount"
-                                param={params.thunderParams.crackleAmount}
-                                onChange={(p) => handleThunderParamChange({ crackleAmount: p })}
-                                valueRange={[0, 1]}
-                                distRange={[0, 0.5]}
-                                step={0.01}
-                            />
-                        </div>
-                    </Section>
-
-                    <Section title='Rumble'>
-                        <div className='flex flex-wrap justify-around gap-4'>
-                            <RandParamController
-                                label="Rumble Freq Start"
-                                param={params.thunderParams.rumbleFreqStart}
-                                onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
-                                valueRange={[20, 100]}
-                                distRange={[0, 10]}
-                                step={1}
-                            />
-                            <RandParamController
-                                label="Rumble Freq End"
-                                param={params.thunderParams.rumbleFreqEnd}
-                                onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
-                                valueRange={[20, 1000]}
-                                distRange={[0, 10]}
-                                step={1}
-                            />
-                            <RandParamController
-                                label="Rumble Volume"
-                                param={params.thunderParams.rumbleVolume}
-                                onChange={(p) => handleThunderParamChange({ rumbleVolume: p })}
-                                valueRange={[0, 1]}
-                                distRange={[0, 0.5]}
-                                step={0.01}
-                            />
-                            <RandParamController
-                                label="Rumble Decay"
-                                param={params.thunderParams.rumbleDecay}
-                                onChange={(p) => handleThunderParamChange({ rumbleDecay: p })}
-                                valueRange={[0, 10]}
-                                distRange={[0, 5]}
-                                step={0.01}
-                            />
-                        </div>
-                    </Section>
-                </Panel>
-            </div>
+                <Section title='Rumble'>
+                    <div className='flex flex-wrap justify-around gap-4'>
+                        <RandParamController
+                            label="Rumble Freq Start"
+                            param={params.thunderParams.rumbleFreqStart}
+                            onChange={(p) => handleThunderParamChange({ rumbleFreqStart: p })}
+                            valueRange={[20, 100]}
+                            distRange={[0, 10]}
+                            step={1}
+                        />
+                        <RandParamController
+                            label="Rumble Freq End"
+                            param={params.thunderParams.rumbleFreqEnd}
+                            onChange={(p) => handleThunderParamChange({ rumbleFreqEnd: p })}
+                            valueRange={[20, 1000]}
+                            distRange={[0, 10]}
+                            step={1}
+                        />
+                        <RandParamController
+                            label="Rumble Volume"
+                            param={params.thunderParams.rumbleVolume}
+                            onChange={(p) => handleThunderParamChange({ rumbleVolume: p })}
+                            valueRange={[0, 1]}
+                            distRange={[0, 0.5]}
+                            step={0.01}
+                        />
+                        <RandParamController
+                            label="Rumble Decay"
+                            param={params.thunderParams.rumbleDecay}
+                            onChange={(p) => handleThunderParamChange({ rumbleDecay: p })}
+                            valueRange={[0, 10]}
+                            distRange={[0, 5]}
+                            step={0.01}
+                        />
+                    </div>
+                </Section>
+            </Panel>
         </div>
     </div>;
 };
 
 const Panel: FC<{
-    title: React.ReactNode,
-    children?: React.ReactNode
-}> = ({ title, children }) => {
-    return <div className="flex flex-col bg-neutral-800 border-4 border-yellow-700 rounded p-4 shadow-inner gap-2 font-[courier] text-amber-100">
-        <h2 className="text-amber-400 text-3xl font-semibold">{title}</h2>
-        {children}
+    title: string,
+    children?: React.ReactNode,
+    openInit?: boolean
+}> = ({ title, children, openInit }) => {
+    const [open, setOpen] = useState(openInit || false);
+
+    return <div
+        className="flex flex-col font-[courier] border"
+        style={{
+            backgroundColor: '#77777777',
+            backdropFilter: 'blur(10px)',
+        }}
+    >
+        <div
+            className="text-xl font-semibold p-2"
+            style={{
+                color: '#de006b',
+            }}
+        >
+            <div className='flex items-center gap-2'>
+                <span>{title}</span>
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="font-bold p-2 cursor-pointer"
+                    style={{
+                        color: '#de006b',
+                    }}
+                    title={(open ? "Hide " : "Show ") + title}
+                >
+                    {open ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
+                </button>
+            </div>
+        </div>
+        {open && children}
     </div>;
 }
 
@@ -564,11 +607,35 @@ const Section: FC<{
     title: string,
     children?: React.ReactNode
 }> = ({ title, children }) => {
-    return <div className="flex flex-col h-fit bg-neutral-900 border-8 border-neutral-700 rounded p-4 shadow-neutral-700 gap-2"
-        style={{ borderStyle: "inset" }}>
-        <h2 className="flex flex-col text-amber-400 text-lg font-semibold">{title}</h2>
+    return <div
+        className="h-full flex flex-col grow p-4 gap-2 font-[courier]"
+        style={{
+            // backgroundColor: '#77777777',
+            borderRadius: '12px',
+
+        }}
+    >
+        <h2 className="flex flex-col text-lg font-semibold">
+            {title}
+        </h2>
         {children}
-    </div>;
+    </div >;
+}
+
+const ControlContainer: FC<{
+    label: string;
+    width?: string;
+    height?: string;
+    children?: React.ReactNode;
+}> = ({ label, children, width, height }) => {
+    return (
+        <div className="flex flex-col items-center shadow-inner border border-neutral-500/30 overflow-hidden" style={{ width, height }}>
+            <label className="w-full p-1 font-medium bg-neutral-600 text-white">{label}</label>
+            <div className="w-full h-full flex items-center justify-center divide-x-2 divide-neutral-500/30">
+                {children}
+            </div>
+        </div>
+    );
 }
 
 const Select: FC<{
@@ -580,7 +647,7 @@ const Select: FC<{
         <select
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-neutral-800 text-amber-400 border border-amber-400 rounded p-2 shadow-inner hover:shadow-[0_0_5px_#00faff] transition"
+            className="bg-pink-500/50 border border-neutral-500 rounded p-2 shadow-inner hover:shadow-[0_0_5px_#00faff] transition cursor-pointer w-full"
         >
             {options.map((option) => (
                 <option key={option} value={option} className="text-black">
@@ -616,6 +683,9 @@ const MinMaxPair = ({
                 max={max}
                 step={step}
                 onChange={(v) => onChange('min', v)}
+                colors={{
+                    labels: 'white',
+                }}
             />
             <Knob
                 label="Max"
@@ -624,6 +694,9 @@ const MinMaxPair = ({
                 max={max}
                 step={step}
                 onChange={(v) => onChange('max', v)}
+                colors={{
+                    labels: 'white',
+                }}
             />
         </div>
     </div>
@@ -657,33 +730,45 @@ const Instructions: FC = () => {
             </ul>
         </Section>
         <Section title='Rain Settings'>
-            <p>Various controls, some can oscillate around the set value.</p>
-            <p>You can adjust the amplitude and frequency of the oscillations.</p>
-            <div className='w-64 flex gap-4'>
-                <OscParamController
-                    label="Sine Wave"
-                    param={sine}
-                    onChange={(p: OscParam) => setSine(p)}
-                    valueRange={[0, 1]}
-                    ampRange={[0, 1]}
-                    freqRange={[0, 10]}
-                />
-                <SineWave param={sine} />
+            <div className='h-full flex flex-col justify-between gap-4'>
+                <p>Various controls, some can oscillate around the set value.</p>
+                <p>You can adjust the amplitude and frequency of the oscillations.</p>
+                <div className='w-full flex flex-wrap gap-4 items-stretch'>
+                    <OscParamController
+                        label="Sine Wave"
+                        param={sine}
+                        onChange={(p: OscParam) => setSine(p)}
+                        valueRange={[0, 1]}
+                        ampRange={[0, 1]}
+                        freqRange={[0, 10]}
+                    />
+                    <div className='h-auto w-64'>
+                        <SineWave param={sine} />
+                    </div>
+                </div>
             </div>
         </Section>
         <Section title='Thunder Settings'>
-            <p>Various controls, most can randomize around the set value, so each thunder strike is a little different.</p>
-            <p>You can adjust the maximum distance to allow random values to deviate from the set value.</p>
-            <div className='w-64 flex gap-4'>
-                <RandParamController
-                    label="Random"
-                    param={rand}
-                    onChange={(p: RandParam) => setRand(p)}
-                    valueRange={[0, 1]}
-                    distRange={[0, 1]}
-                />
-                <RandomBar param={rand} />
+            <div className='h-full flex flex-col justify-between gap-4'>
+                <p>Various controls, most can randomize around the set value, so each thunder strike is a little different.</p>
+                <p>You can adjust the maximum distance to allow random values to deviate from the set value.</p>
+                <div className='w-full flex flex-wrap gap-4'>
+                    <RandParamController
+                        label="Random"
+                        param={rand}
+                        onChange={(p: RandParam) => setRand(p)}
+                        valueRange={[0, 1]}
+                        distRange={[0, 1]}
+                    />
+                    <div className='h-auto w-64'>
+                        <RandomBar param={rand} />
+                    </div>
+                </div>
             </div>
         </Section>
     </div>
+}
+
+const XSeparator: FC = () => {
+    return <div className='w-[1px] h-full bg-neutral-500/30' />;
 }

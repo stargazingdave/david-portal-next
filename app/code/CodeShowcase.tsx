@@ -64,18 +64,22 @@ export const CodeShowcase: FC<CodeShowcaseProps> = ({ projects }) => {
             {projects.map((project, idx) => (
                 <Card
                     key={idx}
-                    className="flex flex-col justify-center items-center border border-zinc-700 rounded-xl overflow-hidden shadow-md"
+                    className="flex flex-col items-center border border-zinc-700 rounded-xl overflow-hidden shadow-md"
                 >
-                    <div className="relative sm:w-50 sm:h-50 w-32 h-32 flex-shrink-0">
-                        <Image
-                            src={isDarkMode ? project.image.dark : project.image.light}
-                            alt={project.description}
-                            fill
-                            className='p-4 object-contain'
-                        />
+                    <div className="flex justify-center w-full pt-2">
+                        <div className="relative w-32 h-32 flex-shrink-0">
+                            <Image
+                                src={isDarkMode ? project.image.dark : project.image.light}
+                                alt={project.description}
+                                fill
+                                className='object-contain'
+                            />
+                        </div>
                     </div>
 
                     <div className="w-full flex flex-col justify-between p-4 gap-2">
+                        <h2 className="text-2xl font-bold text-white mt-1">{project.title}</h2>
+
                         {project.tech && (
                             <div className="flex flex-wrap w-full gap-2 text-xl text-white">
                                 {project.tech.map((tech, i) => (
@@ -85,6 +89,7 @@ export const CodeShowcase: FC<CodeShowcaseProps> = ({ projects }) => {
                                 ))}
                             </div>
                         )}
+
                         <div>
                             <p className='space-x-2 text-zinc-400 text-sm'>
                                 <span
@@ -104,11 +109,11 @@ export const CodeShowcase: FC<CodeShowcaseProps> = ({ projects }) => {
                                 </span>
                             </p>
 
-                            <h2 className="text-2xl font-bold text-white mt-1">{project.title}</h2>
                             <p className="text-zinc-300 mt-2 text-sm leading-relaxed">
                                 {project.description}
                             </p>
                         </div>
+
                         <div className="flex space-x-4 mt-4">
                             {project.links.website && (
                                 <a href={project.links.website} target="_blank" rel="noreferrer">

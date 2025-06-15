@@ -7,8 +7,8 @@ export const useCanvasSize = () => {
     useEffect(() => {
         const resize = () => {
             if (containerRef.current) {
-                const { clientWidth } = containerRef.current;
-                setSize({ width: clientWidth, height: 150 });
+                const { clientWidth, clientHeight } = containerRef.current;
+                setSize({ width: clientWidth, height: clientHeight });
             }
         };
 

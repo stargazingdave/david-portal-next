@@ -1,17 +1,15 @@
 import { useRef, useEffect, useState, JSX } from "react";
 
 export type KnobColors = {
-    /** @type {string} @example "#ff0000" */
+    labels: string;
     body: string;
-    /** @type {string} */
     face: string;
-    /** @type {string} */
     indicator: string;
-    /** @type {string} */
     track: string;
 };
 
 const defaultColors: KnobColors = {
+    labels: '#fff',
     body: '#222',
     face: '#999',
     indicator: '#000',
@@ -242,8 +240,13 @@ export const Knob = ({
     }
 
     return (
-        <div className={`flex flex-col max-w-40 items-center gap-1 font-[courier] ${fontSize} ${disabled ? 'text-amber-200 opacity-50' : 'text-amber-100'} transition ${className}`}>
-            <div className="text-center text-wrap">{label}</div>
+        <div className={`flex flex-col max-w-40 items-center gap-1 font-[courier] font-bold ${fontSize} ${disabled ? 'opacity-50' : ''} transition ${className}`}>
+            <div
+                className="text-center text-wrap"
+                style={{ color: colors?.labels || undefined }}
+            >
+                {label}
+            </div>
             <svg
                 ref={knobRef}
                 width={size}
@@ -311,8 +314,8 @@ export const Knob = ({
             </svg>
 
             {/* Labels */}
-            <div className="relative flex flex-col items-center justify-between text-[10px]"
-                style={{ width: size + 8, height: size * 0.3 }}>
+            <div className="relative flex flex-col items-center justify-end text-[10px]"
+                style={{ width: size + 8, height: 20, color: colors?.labels || undefined }}>
                 {/* Min/Max Labels */}
                 <div className="absolute flex justify-between w-full" style={{ top: -1 * size * 0.15 }}>
                     <span>{min}</span>
@@ -320,7 +323,7 @@ export const Knob = ({
                 </div>
 
                 {/* Value Input */}
-                <div className="w-full flex justify-center">
+                <div className="w-full flex justify-center items-end">
                     <input
                         type="text"
                         inputMode="decimal"
@@ -357,8 +360,11 @@ export const Knob = ({
 
                             e.stopPropagation();
                         }}
-                        className="bg-transparent border-none text-xs text-amber-100 font-mono outline-none text-center"
-                        style={{ width: size }}
+                        className="bg-transparent border-none text-xs font-mono outline-none text-center"
+                        style={{
+                            width: size,
+                            color: colors?.labels || undefined,
+                        }}
                     />
                 </div>
             </div>

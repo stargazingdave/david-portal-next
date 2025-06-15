@@ -50,12 +50,12 @@ export const RandomBar: React.FC<{ param: RandParam }> = ({ param }) => {
     ctx.stroke();
 
     // Value bar
-    ctx.fillStyle = 'yellow';
+    ctx.fillStyle = '#de006b';
     ctx.fillRect(width / 2 - 20, valueY, 40, height - valueY);
   }, [param, randVal, size]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <canvas ref={canvasRef} />
     </div>
   );
