@@ -1,10 +1,21 @@
 import { ReactNode } from "react";
 
-export type CodeProjectTech = 'react' | 'nextjs' | 'tailwind' | 'typescript' | 'javascript' | 'html' | 'css' | 'python' | 'java';
+export type CodeProjectTech =
+    | 'react'
+    | 'nextjs'
+    | 'tailwind'
+    | 'typescript'
+    | 'javascript'
+    | 'html'
+    | 'css'
+    | 'python'
+    | 'java'
+    | 'kotlin'
+    | 'android';
 
 export interface CodeProject {
     title: ReactNode;
-    type: 'website' | 'library' | 'game';
+    type: 'website' | 'library' | 'game' | 'android-app';
     description: string;
     image: {
         light: string;

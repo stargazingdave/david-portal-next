@@ -156,7 +156,9 @@ export const NoiseDUI = () => {
         }
 
         if (isRunning) {
-            controllerRef.current.stop();
+            controllerRef.current?.destroy();
+            controllerRef.current = null;
+
         } else {
             controllerRef.current.start();
         }

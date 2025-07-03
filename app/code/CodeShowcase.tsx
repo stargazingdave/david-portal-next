@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { FC, JSX, useEffect, useState } from 'react';
 import { FaGithub, FaGlobe, FaBook } from 'react-icons/fa';
 import { MdDeveloperBoard } from 'react-icons/md';
-import { SiCss3, SiHtml5, SiJavascript, SiNextdotjs, SiNpm, SiPython, SiReact, SiTailwindcss, SiTypescript } from 'react-icons/si';
+import { SiAndroid, SiCss3, SiHtml5, SiJavascript, SiKotlin, SiNextdotjs, SiNpm, SiPython, SiReact, SiTailwindcss, SiTypescript } from 'react-icons/si';
 
 interface CodeShowcaseProps {
     projects: CodeProject[];
@@ -21,6 +21,7 @@ const projectTypeMap: Record<CodeProject['type'], ProjectStatus> = {
     website: { label: 'Website', color: '#d92aff' },
     library: { label: 'Library', color: '#00e5ff' },
     game: { label: 'Game', color: '#aeff00' },
+    "android-app": { label: 'Android App', color: '#ff9800' },
 };
 
 const projectStatusMap: Record<CodeProject['status'], ProjectStatus> = {
@@ -39,6 +40,8 @@ const techIconMap: Record<CodeProjectTech, JSX.Element> = {
     css: <SiCss3 title="CSS" />,
     python: <SiPython title="Python" />,
     java: <SiJavascript title="Java" />,
+    kotlin: <SiKotlin title="Kotlin" />,
+    android: <SiAndroid title="Android" />,
 };
 
 export const CodeShowcase: FC<CodeShowcaseProps> = ({ projects }) => {

@@ -35,46 +35,61 @@ const getCodeProjects = (): CodeProject[] => {
             },
             links: {
                 demo: '/weather_synth',
-                // docs: 'https://yourdomain.com/dnoise/docs',
                 github: 'https://github.com/stargazingdave/noised',
                 npm: 'https://www.npmjs.com/package/noised',
             },
-            status: 'prod',
+            status: 'dev',
             tech: ['typescript']
         },
         {
-            title: 'NuclearD',
-            type: 'library',
+            title: 'TunerD',
+            type: 'android-app',
             description:
-                'A React component library for basic general-use themed components.',
+                'A simple Android app for tuning musical instruments, built with React Native.',
             image: {
-                light: '/images/nucleard-logo.png',
-                dark: '/images/nucleard-logo.png',
+                light: '/images/tunerd-logo.png',
+                dark: '/images/tunerd-logo.png',
             },
             links: {
-                docs: 'https://yourdomain.com/dbase/docs',
-                github: 'https://github.com/yourrepo/dbase',
-                npm: 'https://www.npmjs.com/package/dbase',
+                website: 'https://davidportal.dev/tunerd',
+                github: 'https://github.com/stargazingdave/tunerd',
             },
-            status: 'dev',
-            tech: ['react', 'tailwind', 'typescript']
-        },
-        {
-            title: <p>Snake <span className="italic">XL</span></p>,
-            type: 'game',
-            description:
-                'An extra-everything Snake game built as a React component as part of dannykrivosh.com.',
-            image: {
-                light: '/images/snakexl-logo.png',
-                dark: '/images/snakexl-logo.png',
-            },
-            links: {
-                demo: 'https://yourdomain.com/snakexl',
-                github: 'https://github.com/yourrepo/snakexl',
-            },
-            status: 'dev',
-            tech: ['react', 'tailwind', 'typescript']
-        },
+            status: 'prod',
+            tech: ['kotlin', 'android']
+        }
+        // {
+        //     title: 'NuclearD',
+        //     type: 'library',
+        //     description:
+        //         'A React component library for basic general-use themed components.',
+        //     image: {
+        //         light: '/images/nucleard-logo.png',
+        //         dark: '/images/nucleard-logo.png',
+        //     },
+        //     links: {
+        //         docs: 'https://yourdomain.com/dbase/docs',
+        //         github: 'https://github.com/yourrepo/dbase',
+        //         npm: 'https://www.npmjs.com/package/dbase',
+        //     },
+        //     status: 'dev',
+        //     tech: ['react', 'tailwind', 'typescript']
+        // },
+        // {
+        //     title: <p>Snake <span className="italic">XL</span></p>,
+        //     type: 'game',
+        //     description:
+        //         'An extra-everything Snake game built as a React component as part of dannykrivosh.com.',
+        //     image: {
+        //         light: '/images/snakexl-logo.png',
+        //         dark: '/images/snakexl-logo.png',
+        //     },
+        //     links: {
+        //         demo: 'https://yourdomain.com/snakexl',
+        //         github: 'https://github.com/yourrepo/snakexl',
+        //     },
+        //     status: 'dev',
+        //     tech: ['react', 'tailwind', 'typescript']
+        // },
     ];
 
     return projects;
