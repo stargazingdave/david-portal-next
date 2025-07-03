@@ -43,3 +43,6 @@ next-env.d.ts
 # yalc packages
 .yalc
 yalc.lock
+
+# tests
+/tests
