@@ -3,19 +3,32 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button, Card } from "@dpdev/nucleard";
+import { useTheme } from "./contexts/ThemeProvider";
 
 export function HomePage() {
+  const { resolvedTheme } = useTheme();
+
   const pages = [
     {
-      label: 'Code',
-      href: '/code',
+      label: 'About Me',
+      href: '/about',
+      image: '/images/me.jpg'
+    },
+    {
+      label: 'Projects',
+      href: '/projects',
       image: '/images/code.jpg'
     },
     {
-      label: 'Weather Synth',
+      label: 'NoiseD',
       href: '/weather_synth',
       image: '/images/thunder.jpg'
     },
+    {
+      label: 'TunerD',
+      href: '/tunerd',
+      image: '/images/tunerd-tile.jpg'
+    }
   ]
   return (
     <div className="w-full h-full min-h-full flex flex-col items-center p-4 relative">
@@ -26,15 +39,29 @@ export function HomePage() {
             alt="Logo"
             fill
             className="object-contain object-left-top"
-            sizes="100vw"
+            sizes="50vw"
           />
         </div>
       </div>
-      <div className="flex flex-col items-center gap-2 font-[family-name:var(--font-comfortaa)]">
-        <h1 className="text-4xl sm:text-6xl font-semibold p-8">
-          Welcome
-        </h1>
-      </div>
+      <Card
+        style={{
+          boxShadow: "var(--shadow)",
+        }}
+        overlayColor={resolvedTheme === "dark" ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'}
+        glassy
+        hoverable
+      >
+        <div className="flex flex-col items-center gap-2 font-[family-name:var(--font-comfortaa)]">
+          <h1 className="text-4xl sm:text-6xl font-semibold p-8">
+            Welcome
+          </h1>
+          <p className="max-w-xl text-center text-base sm:text-lg px-4">
+            I’m David — full-stack dev, sound nerd, and curious builder.
+            This site showcases some of the things I’ve been crafting lately —
+            tools, experiments, and bits of code I’m proud of.
+          </p>
+        </div>
+      </Card>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {pages.map((page, index) => (
           <Link
@@ -53,7 +80,7 @@ export function HomePage() {
               glassy
               hoverable
             >
-              <p className="text-4xl sm:text-6xl">
+              <p className="text-4xl sm:text-6xl p-8">
                 {page.label}
               </p>
             </Card>

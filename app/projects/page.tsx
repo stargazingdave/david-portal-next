@@ -12,7 +12,7 @@ const getCodeProjects = (): CodeProject[] => {
             title: 'dannykrivosh.com',
             type: 'website',
             description:
-                'A chaotically themed music site for Danny, the greatest musician on earth, designed as a coop between us.',
+                'A chaotically themed music site for Danny, the greatest musician on earth, designed as a collaborative effort between us.',
             image: {
                 light: '/images/danny-icon.png',
                 dark: '/images/danny-icon.png',
@@ -22,13 +22,13 @@ const getCodeProjects = (): CodeProject[] => {
                 github: 'https://github.com/stargazingdave/danny-krivosh-next-app',
             },
             status: 'prod',
-            tech: ['react', 'nextjs', 'tailwind', 'typescript']
+            tech: ['react', 'nextjs', 'supabase', 'tailwind', 'typescript']
         },
         {
             title: 'NoiseD',
             type: 'library',
             description:
-                'A JavaScript library for generating background noise like rain and thunders.',
+                'A lightweight JavaScript library that creates realistic rain and thunder sounds, with no external dependencies. It’s designed for adding ambiance to any JavaScript project. The demo allows you to design the soundscape you want, and download the parameters as JSON.',
             image: {
                 light: '/images/noised-logo-icon.png',
                 dark: '/images/noised-logo-icon.png',
@@ -45,7 +45,7 @@ const getCodeProjects = (): CodeProject[] => {
             title: 'TunerD',
             type: 'android-app',
             description:
-                'A simple Android app for tuning musical instruments, built with React Native.',
+                'A simple Android app for tuning guitars — no ads, no nonsense. Just a clean interface that gets the job done, with easy tuning selection. Available via APK download',
             image: {
                 light: '/images/tunerd-logo.png',
                 dark: '/images/tunerd-logo.png',

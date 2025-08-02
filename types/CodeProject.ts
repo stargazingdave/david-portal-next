@@ -11,7 +11,8 @@ export type CodeProjectTech =
     | 'python'
     | 'java'
     | 'kotlin'
-    | 'android';
+    | 'android'
+    | 'supabase';
 
 export interface CodeProject {
     title: ReactNode;
