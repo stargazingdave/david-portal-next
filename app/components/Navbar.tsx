@@ -17,9 +17,9 @@ export const Navbar: FC<NavbarProps> = ({
     return (
         <div className="flex items-center justify-between w-full h-full p-4 bg-[var(--background)]/30 backdrop-blur-md text-[var(--text)]">
             <div className="flex items-center gap-2 font-[family-name:var(--font-comfortaa)]">
-                <Button onClick={() => setSidebarOpen(!sidebarOpen)} clearStyle>
+                {/* <Button onClick={() => setSidebarOpen(!sidebarOpen)} clearStyle>
                     <HiOutlineMenu size={30} className="color-swap text-[var(--text-color)] transition duration-200 ease-in-out" />
-                </Button>
+                </Button> */}
                 {/* <div className="flex items-center justify-center rounded-full h-12 w-12 border-2">
                     <h1 className="text-xl font-bold tracking-tighter">dpd</h1>
                 </div> */}
