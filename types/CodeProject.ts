@@ -24,7 +24,6 @@ export interface CodeProject {
     };
     links: {
         website?: string;
-        demo?: string;
         docs?: string;
         github?: string;
         npm?: string;
