@@ -8,6 +8,9 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            height: {
+                screen: '100vh',
+            },
             animation: {
                 'spin-slow': 'spin 10s linear infinite',
                 'spin-reverse-slow': 'spin-reverse 14s linear infinite',

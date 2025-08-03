@@ -32,7 +32,7 @@ export function HomePage() {
   ]
   return (
     <div className="w-full h-full min-h-full flex flex-col items-center p-4 relative">
-      <div className="fixed top-0 left-0 w-1/3 h-[150%] z-[-10] pl-32 pointer-events-none">
+      {/* <div className="fixed top-0 left-0 w-1/3 h-[150%] z-[-10] pl-32 pointer-events-none">
         <div className="relative h-full w-full">
           <Image
             src="/images/dpd-logo.png"
@@ -42,26 +42,17 @@ export function HomePage() {
             sizes="50vw"
           />
         </div>
+      </div> */}
+      <div className="flex flex-col items-center gap-2 font-[family-name:var(--font-comfortaa)]">
+        <h1 className="text-4xl sm:text-6xl font-semibold p-8">
+          Welcome
+        </h1>
+        <p className="max-w-xl text-center text-base sm:text-lg px-4">
+          I’m David — full-stack dev, sound nerd, and curious builder.
+          This site showcases some of the things I’ve been crafting lately —
+          tools, experiments, and bits of code I’m proud of.
+        </p>
       </div>
-      <Card
-        style={{
-          boxShadow: "var(--shadow)",
-        }}
-        overlayColor={resolvedTheme === "dark" ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'}
-        glassy
-        hoverable
-      >
-        <div className="flex flex-col items-center gap-2 font-[family-name:var(--font-comfortaa)]">
-          <h1 className="text-4xl sm:text-6xl font-semibold p-8">
-            Welcome
-          </h1>
-          <p className="max-w-xl text-center text-base sm:text-lg px-4">
-            I’m David — full-stack dev, sound nerd, and curious builder.
-            This site showcases some of the things I’ve been crafting lately —
-            tools, experiments, and bits of code I’m proud of.
-          </p>
-        </div>
-      </Card>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {pages.map((page, index) => (
           <Link
