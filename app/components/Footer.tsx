@@ -1,9 +1,6 @@
-import Link from "next/link";
 import { FC } from "react";
 
 export const Footer: FC = () => {
-    const year = new Date().getFullYear();
-
     return (
         <footer className="border-t p-4">
             <div className="max-w-6xl mx-auto grid gap-10 md:grid-cols-3">

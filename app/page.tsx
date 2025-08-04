@@ -8,22 +8,6 @@ export default async function Home() {
 const getCodeProjects = (): CodeProject[] => {
   const projects: CodeProject[] = [
     {
-      title: 'dannykrivosh.com',
-      type: 'website',
-      description:
-        'A chaotically themed music site for Danny, the greatest musician on earth, designed as a collaborative effort between us.',
-      image: {
-        light: '/images/danny-icon.png',
-        dark: '/images/danny-icon.png',
-      },
-      links: {
-        website: 'https://dannykrivosh.com',
-        github: 'https://github.com/stargazingdave/danny-krivosh-next-app',
-      },
-      status: 'prod',
-      tech: ['react', 'nextjs', 'supabase', 'tailwind', 'typescript']
-    },
-    {
       title: 'NoiseD',
       type: 'library',
       description:
@@ -39,6 +23,22 @@ const getCodeProjects = (): CodeProject[] => {
       },
       status: 'dev',
       tech: ['typescript']
+    },
+    {
+      title: 'dannykrivosh.com',
+      type: 'website',
+      description:
+        'A personalized website for Danny Krivosh, showcasing his music and filled with character, easter eggs, and unique design elements.',
+      image: {
+        light: '/images/danny-icon.png',
+        dark: '/images/danny-icon.png',
+      },
+      links: {
+        website: 'https://dannykrivosh.com',
+        github: 'https://github.com/stargazingdave/danny-krivosh-next-app',
+      },
+      status: 'prod',
+      tech: ['react', 'nextjs', 'supabase', 'tailwind', 'typescript']
     },
     {
       title: 'TunerD',
