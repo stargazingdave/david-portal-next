@@ -3,7 +3,7 @@
 import { Card } from "@dpdev/nucleard";
 import Image from "next/image";
 import type { JSX } from "react";
-import { FaBook, FaGithub } from "react-icons/fa";
+import { FaBook, FaGithub, FaPlay } from "react-icons/fa";
 import {
     SiAndroid,
     SiCss3,
@@ -14,8 +14,10 @@ import {
     SiNpm,
     SiPython,
     SiReact,
+    SiRust,
     SiSupabase,
     SiTailwindcss,
+    SiTauri,
     SiTypescript,
 } from "react-icons/si";
 import type { Project, ProjectTechnology } from "../types/project";
@@ -34,6 +36,7 @@ const projectTypes: Record<Project["type"], ProjectBadge> = {
     library: { label: "Library", color: "#00e5ff" },
     game: { label: "Game", color: "#6a9400" },
     "android-app": { label: "Android App", color: "#d46f00" },
+    "desktop-app": { label: "Desktop App", color: "#2563eb" },
 };
 
 const projectStatuses: Record<Project["status"], ProjectBadge> = {
@@ -54,6 +57,8 @@ const technologyIcons: Record<ProjectTechnology, JSX.Element> = {
     java: <SiJavascript aria-label="Java" />,
     kotlin: <SiKotlin aria-label="Kotlin" />,
     android: <SiAndroid aria-label="Android" />,
+    rust: <SiRust aria-label="Rust" />,
+    tauri: <SiTauri aria-label="Tauri" />,
     supabase: <SiSupabase aria-label="Supabase" />,
 };
 
@@ -64,7 +69,19 @@ function ProjectImage({ project }: Readonly<{ project: Project }>) {
     } as const;
 
     if (project.image.light === project.image.dark) {
-        return <Image {...sharedProps} alt={`${project.title} logo`} className="object-contain" src={project.image.light} />;
+        return (
+            <>
+                {project.image.background && (
+                    <Image {...sharedProps} alt="" className="rounded-2xl object-cover" src={project.image.background} />
+                )}
+                <Image
+                    {...sharedProps}
+                    alt={`${project.title} logo`}
+                    className={project.image.background ? "object-contain p-2" : "object-contain"}
+                    src={project.image.light}
+                />
+            </>
+        );
     }
 
     return (
@@ -118,6 +135,7 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                         </div>
 
                         <div className="mt-4 flex space-x-4">
+                            {project.links.demo && <a aria-label={`Play ${project.title}`} href={project.links.demo} rel="noreferrer" target="_blank"><FaPlay className="text-xl hover:text-green-400" /></a>}
                             {project.links.docs && <a aria-label={`${project.title} documentation`} href={project.links.docs}><FaBook className="text-xl hover:text-yellow-400" /></a>}
                             {project.links.github && <a aria-label={`${project.title} on GitHub`} href={project.links.github} rel="noreferrer" target="_blank"><FaGithub className="text-xl hover:text-gray-400" /></a>}
                             {project.links.npm && <a aria-label={`${project.title} on npm`} href={project.links.npm} rel="noreferrer" target="_blank"><SiNpm className="text-xl hover:text-orange-400" /></a>}

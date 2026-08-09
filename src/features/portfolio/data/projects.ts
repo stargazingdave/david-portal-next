@@ -2,6 +2,39 @@ import type { Project } from "../types/project";
 
 export const projects = [
     {
+        title: "Agent Diagram",
+        type: "desktop-app",
+        description:
+            "A local Windows diagram editor built for humans and AI agents. Create structured diagrams visually or through MCP, then export them as PNG or SVG.",
+        image: {
+            light: "/images/agent-diagram-mark.svg",
+            dark: "/images/agent-diagram-mark.svg",
+            background: "/images/agent-diagram-background.svg",
+        },
+        links: {
+            website: "/agent-diagram",
+        },
+        status: "prod",
+        tech: ["react", "typescript", "rust", "tauri"],
+    },
+    {
+        title: "Orlog",
+        type: "game",
+        description:
+            "A browser adaptation of the Viking dice game with tactical combat, God Favors, and local, online, or AI-powered play.",
+        image: {
+            light: "/images/orlog.png",
+            dark: "/images/orlog.png",
+        },
+        links: {
+            website: "/orlog",
+            github: "https://github.com/stargazingdave/orlog",
+            demo: "https://orlog-delta.vercel.app/",
+        },
+        status: "dev",
+        tech: ["react", "nextjs", "supabase", "tailwind", "typescript"],
+    },
+    {
         title: "NoiseD",
         type: "library",
         description:
