@@ -1,6 +1,5 @@
 'use client';
 
-
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Equalizer } from './components/Equalizer';
 import { CustomKnob as Knob } from './components/CustomKnob';
@@ -8,12 +7,9 @@ import Image from 'next/image';
 import { OscParam } from './types/OscParam';
 import { OscParamController } from './components/OscParamController';
 import { RandParamController } from './components/RandParamController';
-import { IoChevronDown, IoChevronUp, IoDownload, IoPlay, IoSave, IoStop } from 'react-icons/io5';
+import { IoSave } from 'react-icons/io5';
 import { Visualization } from '../Visualization';
 import { _defaultNoiseDParams, NoiseDController, NoiseDParams, NoiseType, ThunderParams, Range } from 'noised';
-import { SineWave } from './components/demos/SineWave';
-import { RandomBar } from './components/demos/RandomBar';
-import { RandParam } from './types/RandParam';
 import { Tooltip } from '../Tooltip';
 import { useTheme } from '@/app/contexts/ThemeProvider';
 
@@ -166,18 +162,22 @@ export const NoiseDUI = () => {
     };
 
     const handleDownloadParams = () => {
-        if (!controllerRef.current) return;
-        const json = controllerRef.current.exportParamsAsJSON();
+        const json = JSON.stringify(params, null, 2);
+        downloadJson(json);
+    };
+
+    function downloadJson(json: string) {
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement('a');
         a.href = url;
         a.download = 'noised-params.json';
+        document.body.appendChild(a);   // ⬅️ required in some browsers
         a.click();
-
+        document.body.removeChild(a);   // cleanup
         URL.revokeObjectURL(url);
-    };
+    }
 
     const equalizerColors = theme === 'dark'
         ? {

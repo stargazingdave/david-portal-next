@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { Navbar } from "./components/Navbar";
 import { Sidebar } from "./components/Sidebar";
 import { useState } from "react";
+import { usePrismTheme } from "./hooks/usePrismTheme";
 
 
 export default function ClientLayout({
@@ -12,6 +13,7 @@ export default function ClientLayout({
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  usePrismTheme();
 
   return (
     <div className="relative h-full w-full">
