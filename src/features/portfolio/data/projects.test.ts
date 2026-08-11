@@ -15,6 +15,7 @@ describe("projects", () => {
     it("links Agent Diagram to its project page", () => {
         const agentDiagram = projects.find((project) => project.title === "Agent Diagram");
         expect(agentDiagram?.links.website).toBe("/agent-diagram");
+        expect(agentDiagram?.links.download).toBe("/downloads/agent-diagram-0.1.0-x64-setup.exe");
         expect(agentDiagram?.links.github).toBe("https://github.com/stargazingdave/agent-diagram");
     });
 
@@ -34,6 +35,7 @@ describe("projects", () => {
         expect(noised?.status).toBe("experiment");
         expect(noised?.links.demo).toBe("/noised/demo");
         expect(tunerd?.status).toBe("experiment");
+        expect(tunerd?.links.download).toBe("/downloads/tunerd-v1.0-release.apk");
     });
 
     it("links Danny Krivosh to its dedicated project page", () => {

@@ -3,7 +3,8 @@
 import { Card } from "@dpdev/nucleard";
 import Image from "next/image";
 import type { JSX } from "react";
-import { FaBook, FaGithub, FaPlay } from "react-icons/fa";
+import { FaBook, FaDownload, FaGithub, FaPlay } from "react-icons/fa";
+import type { IconType } from "react-icons";
 import {
     SiAndroid,
     SiCss3,
@@ -20,6 +21,7 @@ import {
     SiTauri,
     SiTypescript,
 } from "react-icons/si";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Project, ProjectTechnology } from "../types/project";
 
 interface ProjectShowcaseProps {
@@ -93,9 +95,39 @@ function ProjectImage({ project }: Readonly<{ project: Project }>) {
     );
 }
 
+interface ProjectActionProps {
+    download?: boolean;
+    href: string;
+    icon: IconType;
+    iconClassName?: string;
+    label: string;
+    newTab?: boolean;
+}
+
+function ProjectAction({ download, href, icon: Icon, iconClassName = "", label, newTab }: Readonly<ProjectActionProps>) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <a
+                    aria-label={label}
+                    className="group rounded-full p-2 transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    download={download || undefined}
+                    href={href}
+                    rel={newTab ? "noreferrer" : undefined}
+                    target={newTab ? "_blank" : undefined}
+                    title={label}
+                >
+                    <Icon aria-hidden className={`text-xl transition ${iconClassName}`} />
+                </a>
+            </TooltipTrigger>
+            <TooltipContent side="top" sideOffset={8}>{label}</TooltipContent>
+        </Tooltip>
+    );
+}
+
 export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
     return (
-        <section aria-label="Projects" className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+        <section aria-label="Projects" className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3" id="projects">
             {projects.map((project) => (
                 <Card
                     key={project.title}
@@ -135,12 +167,13 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                             <p className="mt-2 text-sm leading-relaxed">{project.description}</p>
                         </div>
 
-                        <div className="mt-4 flex space-x-4">
-                            {project.links.demo && <a aria-label={`Play ${project.title}`} href={project.links.demo} rel="noreferrer" target="_blank"><FaPlay className="text-xl hover:text-green-400" /></a>}
-                            {project.links.docs && <a aria-label={`${project.title} documentation`} href={project.links.docs}><FaBook className="text-xl hover:text-yellow-400" /></a>}
-                            {project.links.github && <a aria-label={`${project.title} on GitHub`} href={project.links.github} rel="noreferrer" target="_blank"><FaGithub className="text-xl hover:text-gray-400" /></a>}
-                            {project.links.modelGithub && <a aria-label={`${project.title} model training on GitHub`} href={project.links.modelGithub} rel="noreferrer" target="_blank"><FaGithub className="text-xl text-violet-500 hover:text-violet-400" /></a>}
-                            {project.links.npm && <a aria-label={`${project.title} on npm`} href={project.links.npm} rel="noreferrer" target="_blank"><SiNpm className="text-xl hover:text-orange-400" /></a>}
+                        <div className="mt-3 flex items-center gap-1">
+                            {project.links.demo && <ProjectAction href={project.links.demo} icon={FaPlay} iconClassName="group-hover:text-green-500" label={project.actionLabels?.demo ?? `Try ${project.title}`} newTab />}
+                            {project.links.download && <ProjectAction download href={project.links.download} icon={FaDownload} iconClassName="group-hover:text-blue-500" label={project.actionLabels?.download ?? `Download ${project.title}`} />}
+                            {project.links.docs && <ProjectAction href={project.links.docs} icon={FaBook} iconClassName="group-hover:text-yellow-500" label={project.actionLabels?.docs ?? `${project.title} documentation`} />}
+                            {project.links.github && <ProjectAction href={project.links.github} icon={FaGithub} iconClassName="group-hover:text-zinc-400" label={project.actionLabels?.github ?? `${project.title} on GitHub`} newTab />}
+                            {project.links.modelGithub && <ProjectAction href={project.links.modelGithub} icon={FaGithub} iconClassName="text-violet-500 group-hover:text-violet-400" label={project.actionLabels?.modelGithub ?? `${project.title} model training on GitHub`} newTab />}
+                            {project.links.npm && <ProjectAction href={project.links.npm} icon={SiNpm} iconClassName="group-hover:text-orange-500" label={project.actionLabels?.npm ?? `${project.title} on npm`} newTab />}
                         </div>
                     </div>
                 </Card>

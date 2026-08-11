@@ -13,7 +13,12 @@ export const projects = [
         },
         links: {
             website: "/agent-diagram",
+            download: "/downloads/agent-diagram-0.1.0-x64-setup.exe",
             github: "https://github.com/stargazingdave/agent-diagram",
+        },
+        actionLabels: {
+            download: "Download Agent Diagram",
+            github: "View Agent Diagram source",
         },
         status: "prod",
         tech: ["react", "typescript", "rust", "tauri"],
@@ -33,6 +38,11 @@ export const projects = [
             modelGithub: "https://github.com/stargazingdave/self_orlog",
             demo: "https://orlog-delta.vercel.app/",
         },
+        actionLabels: {
+            demo: "Play Orlog",
+            github: "View Orlog source",
+            modelGithub: "View Orlog AI training source",
+        },
         status: "prod",
         tech: ["react", "nextjs", "supabase", "tailwind", "typescript", "python"],
     },
@@ -51,6 +61,11 @@ export const projects = [
             npm: "https://www.npmjs.com/package/noised",
             demo: "/noised/demo",
         },
+        actionLabels: {
+            demo: "Try NoiseD",
+            github: "View NoiseD source",
+            npm: "View NoiseD on npm",
+        },
         status: "experiment",
         tech: ["typescript"],
     },
@@ -68,6 +83,10 @@ export const projects = [
             demo: "https://dannykrivosh.com",
             github: "https://github.com/stargazingdave/danny-krivosh-next-app",
         },
+        actionLabels: {
+            demo: "Visit Danny's website",
+            github: "View dannykrivosh.com source",
+        },
         status: "prod",
         tech: ["react", "nextjs", "supabase", "tailwind", "typescript"],
     },
@@ -82,7 +101,12 @@ export const projects = [
         },
         links: {
             website: "/tunerd",
+            download: "/downloads/tunerd-v1.0-release.apk",
             github: "https://github.com/stargazingdave/tunerd",
+        },
+        actionLabels: {
+            download: "Download TunerD",
+            github: "View TunerD source",
         },
         status: "experiment",
         tech: ["kotlin", "android"],

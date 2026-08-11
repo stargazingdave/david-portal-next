@@ -26,10 +26,19 @@ export interface Project {
     links: {
         website?: string;
         docs?: string;
+        download?: string;
         github?: string;
         modelGithub?: string;
         npm?: string;
         demo?: string;
+    };
+    actionLabels?: {
+        demo?: string;
+        docs?: string;
+        download?: string;
+        github?: string;
+        modelGithub?: string;
+        npm?: string;
     };
     status: "dev" | "prod" | "experiment" | "discontinued";
     tech?: readonly ProjectTechnology[];
