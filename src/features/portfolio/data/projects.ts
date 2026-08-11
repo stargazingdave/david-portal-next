@@ -13,6 +13,7 @@ export const projects = [
         },
         links: {
             website: "/agent-diagram",
+            github: "https://github.com/stargazingdave/agent-diagram",
         },
         status: "prod",
         tech: ["react", "typescript", "rust", "tauri"],
@@ -29,16 +30,17 @@ export const projects = [
         links: {
             website: "/orlog",
             github: "https://github.com/stargazingdave/orlog",
+            modelGithub: "https://github.com/stargazingdave/self_orlog",
             demo: "https://orlog-delta.vercel.app/",
         },
-        status: "dev",
-        tech: ["react", "nextjs", "supabase", "tailwind", "typescript"],
+        status: "prod",
+        tech: ["react", "nextjs", "supabase", "tailwind", "typescript", "python"],
     },
     {
         title: "NoiseD",
         type: "library",
         description:
-            "A lightweight JavaScript library that creates realistic rain and thunder sounds, with no external dependencies. The demo lets you design a soundscape and download its parameters as JSON.",
+            "An experiment in creating realistic rain and thunder entirely in JavaScript, with no external dependencies. It produced convincing sound, but complex soundscapes exposed reliability and live-editing limits.",
         image: {
             light: "/images/noised-logo-icon.png",
             dark: "/images/noised-logo-icon.png",
@@ -47,8 +49,9 @@ export const projects = [
             website: "/noised",
             github: "https://github.com/stargazingdave/noised",
             npm: "https://www.npmjs.com/package/noised",
+            demo: "/noised/demo",
         },
-        status: "dev",
+        status: "experiment",
         tech: ["typescript"],
     },
     {
@@ -61,7 +64,8 @@ export const projects = [
             dark: "/images/danny-icon.png",
         },
         links: {
-            website: "https://dannykrivosh.com",
+            website: "/dannykrivosh",
+            demo: "https://dannykrivosh.com",
             github: "https://github.com/stargazingdave/danny-krivosh-next-app",
         },
         status: "prod",
@@ -71,7 +75,7 @@ export const projects = [
         title: "TunerD",
         type: "android-app",
         description:
-            "A simple Android app for tuning guitars—no ads, no nonsense. It provides a clean interface and easy tuning selection through a downloadable APK.",
+            "An experiment in building a simple, ad-free Android guitar tuner. After testing several pitch-detection algorithms and display optimizations, it became usable but not as reliable as commercial tuning apps.",
         image: {
             light: "/images/tunerd-logo.png",
             dark: "/images/tunerd-logo.png",
@@ -80,7 +84,7 @@ export const projects = [
             website: "/tunerd",
             github: "https://github.com/stargazingdave/tunerd",
         },
-        status: "prod",
+        status: "experiment",
         tech: ["kotlin", "android"],
     },
 ] as const satisfies readonly Project[];

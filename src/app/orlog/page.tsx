@@ -83,7 +83,16 @@ export default function OrlogPage() {
                             target="_blank"
                         >
                             <FaGithub aria-hidden className="text-xl" />
-                            View source
+                            Game source
+                        </a>
+                        <a
+                            className="inline-flex items-center gap-3 rounded-xl border bg-card px-6 py-3.5 font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+                            href="https://github.com/stargazingdave/self_orlog"
+                            rel="noreferrer"
+                            target="_blank"
+                        >
+                            <LuBot aria-hidden className="text-xl text-violet-600 dark:text-violet-400" />
+                            AI training source
                         </a>
                     </div>
                 </div>

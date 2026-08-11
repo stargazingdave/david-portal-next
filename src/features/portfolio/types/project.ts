@@ -27,9 +27,10 @@ export interface Project {
         website?: string;
         docs?: string;
         github?: string;
+        modelGithub?: string;
         npm?: string;
         demo?: string;
     };
-    status: "dev" | "prod" | "discontinued";
+    status: "dev" | "prod" | "experiment" | "discontinued";
     tech?: readonly ProjectTechnology[];
 }

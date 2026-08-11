@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { FaDownload, FaLock, FaWindows } from "react-icons/fa";
+import { FaDownload, FaGithub, FaLock, FaWindows } from "react-icons/fa";
 import { SiTauri } from "react-icons/si";
 
 export const metadata: Metadata = {
@@ -65,14 +65,25 @@ export default function AgentDiagramPage() {
                         A local desktop diagram editor designed for humans and AI agents. Shape ideas visually, collaborate with an MCP-connected agent, and keep the structured source on your own computer.
                     </p>
 
-                    <a
-                        className="mt-7 inline-flex items-center gap-3 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
-                        download
-                        href="/downloads/agent-diagram-0.1.0-x64-setup.exe"
-                    >
-                        <FaDownload aria-hidden />
-                        Download for Windows
-                    </a>
+                    <div className="mt-7 flex flex-wrap justify-center gap-3 lg:justify-start">
+                        <a
+                            className="inline-flex items-center gap-3 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                            download
+                            href="/downloads/agent-diagram-0.1.0-x64-setup.exe"
+                        >
+                            <FaDownload aria-hidden />
+                            Download for Windows
+                        </a>
+                        <a
+                            className="inline-flex items-center gap-3 rounded-xl border bg-card px-6 py-3.5 font-bold shadow-sm transition hover:-translate-y-0.5 hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                            href="https://github.com/stargazingdave/agent-diagram"
+                            rel="noreferrer"
+                            target="_blank"
+                        >
+                            <FaGithub aria-hidden className="text-xl" />
+                            View source
+                        </a>
+                    </div>
                     <p className="mt-3 text-sm text-muted-foreground">64-bit installer · Version 0.1.0 · 22.6 MB</p>
                 </div>
             </section>

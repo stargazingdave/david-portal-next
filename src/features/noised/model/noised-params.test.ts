@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { _defaultNoiseDParams } from "noised";
-import { cloneNoisedParams } from "./noised-params";
+import savedNoisedParams from "../../../../noised-params.json";
+import { cloneNoisedParams, initialNoisedParams } from "./noised-params";
 
 describe("cloneNoisedParams", () => {
+    it("uses the saved demo parameters as its initial state", () => {
+        expect(initialNoisedParams).toEqual(savedNoisedParams);
+    });
+
     it("creates an independent deep clone", () => {
-        const original = structuredClone(_defaultNoiseDParams);
+        const original = structuredClone(initialNoisedParams);
         const clone = cloneNoisedParams(original);
 
         clone.eqGains[0] += 1;

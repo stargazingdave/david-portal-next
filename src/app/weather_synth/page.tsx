@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function LegacyWeatherSynthPage() {
-    redirect("/noised");
+    redirect("/noised/demo");
 }

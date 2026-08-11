@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { _defaultNoiseDParams, NoiseDController } from "noised";
+import { NoiseDController } from "noised";
 import type { NoiseDParams, NoiseType, Range, ThunderParams } from "noised";
 import type { OscParam } from "../components/synth/types/osc-param";
-import { cloneNoisedParams } from "../model/noised-params";
+import { cloneNoisedParams, initialNoisedParams } from "../model/noised-params";
 
 type RangeBound = keyof Range<number>;
 
@@ -30,7 +30,7 @@ export interface NoisedActions {
 }
 
 export function useNoisedController() {
-    const [params, setParams] = useState<NoiseDParams>(() => cloneNoisedParams(_defaultNoiseDParams));
+    const [params, setParams] = useState<NoiseDParams>(() => cloneNoisedParams(initialNoisedParams));
     const paramsRef = useRef<NoiseDParams>(params);
     const audioContextRef = useRef<AudioContext | null>(null);
     const controllerRef = useRef<NoiseDController | null>(null);

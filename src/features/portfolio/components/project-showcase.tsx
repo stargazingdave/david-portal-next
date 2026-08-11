@@ -42,6 +42,7 @@ const projectTypes: Record<Project["type"], ProjectBadge> = {
 const projectStatuses: Record<Project["status"], ProjectBadge> = {
     dev: { label: "In Development", color: "#a87900" },
     prod: { label: "Production", color: "#098638" },
+    experiment: { label: "Experiment", color: "#7c3aed" },
     discontinued: { label: "Discontinued", color: "#707070" },
 };
 
@@ -138,6 +139,7 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                             {project.links.demo && <a aria-label={`Play ${project.title}`} href={project.links.demo} rel="noreferrer" target="_blank"><FaPlay className="text-xl hover:text-green-400" /></a>}
                             {project.links.docs && <a aria-label={`${project.title} documentation`} href={project.links.docs}><FaBook className="text-xl hover:text-yellow-400" /></a>}
                             {project.links.github && <a aria-label={`${project.title} on GitHub`} href={project.links.github} rel="noreferrer" target="_blank"><FaGithub className="text-xl hover:text-gray-400" /></a>}
+                            {project.links.modelGithub && <a aria-label={`${project.title} model training on GitHub`} href={project.links.modelGithub} rel="noreferrer" target="_blank"><FaGithub className="text-xl text-violet-500 hover:text-violet-400" /></a>}
                             {project.links.npm && <a aria-label={`${project.title} on npm`} href={project.links.npm} rel="noreferrer" target="_blank"><SiNpm className="text-xl hover:text-orange-400" /></a>}
                         </div>
                     </div>
