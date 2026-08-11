@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { NoiseDController } from "noised";
 import type { NoiseDParams, NoiseType, Range, ThunderParams } from "noised";
 import type { OscParam } from "../components/synth/types/osc-param";
-import { cloneNoisedParams, initialNoisedParams } from "../model/noised-params";
+import {
+    cloneNoisedParams,
+    initialNoisedParams,
+    type NoisedPreset,
+    type NoisedPresetId,
+} from "../model/noised-params";
 
 type RangeBound = keyof Range<number>;
 
@@ -36,11 +41,13 @@ export function useNoisedController() {
     const controllerRef = useRef<NoiseDController | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+    const [activePresetId, setActivePresetId] = useState<NoisedPresetId | null>("default");
 
     const commitParams = (update: (current: NoiseDParams) => NoiseDParams) => {
         const next = update(paramsRef.current);
         paramsRef.current = next;
         setParams(next);
+        setActivePresetId(null);
     };
     const updateRain = (update: Partial<NoiseDParams["rainParams"]>) => {
         commitParams((current) => ({
@@ -55,6 +62,20 @@ export function useNoisedController() {
         if (audioContextRef.current) void audioContextRef.current.close();
         audioContextRef.current = null;
     }, []);
+
+    const loadPreset = (preset: NoisedPreset) => {
+        const next = cloneNoisedParams(preset.params);
+        paramsRef.current = next;
+        setParams(next);
+        setActivePresetId(preset.id);
+
+        if (!controllerRef.current || !audioContextRef.current) return;
+
+        controllerRef.current.destroy();
+        controllerRef.current = new NoiseDController(audioContextRef.current, next);
+        setAnalyser(controllerRef.current.getAnalyser());
+        controllerRef.current.start();
+    };
 
     const actions: NoisedActions = {
         setMasterVolume(value) {
@@ -158,5 +179,5 @@ export function useNoisedController() {
         setIsRunning(true);
     };
 
-    return { actions, analyser, isRunning, params, toggle };
+    return { actions, activePresetId, analyser, isRunning, loadPreset, params, toggle };
 }
