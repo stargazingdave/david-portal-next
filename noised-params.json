@@ -18,11 +18,11 @@
   ],
   "rainParams": {
     "volume": 0.5,
-    "noiseLevel": 0.35000000000000003,
-    "noiseType": "pink",
+    "noiseLevel": 0.5,
+    "noiseType": "white",
     "noiseFilterFreq": {
-      "value": 4000,
-      "osc": true,
+      "value": 2600,
+      "osc": false,
       "amp": 1000,
       "freq": 0.25
     },
@@ -42,13 +42,13 @@
     "dropWetLevel": 0.5,
     "dropRate": 95,
     "dropMinPitch": {
-      "value": 300,
+      "value": 410,
       "osc": true,
       "amp": 100,
       "freq": 0.1
     },
     "dropMaxPitch": {
-      "value": 800,
+      "value": 1158,
       "osc": true,
       "amp": 500,
       "freq": 0.1
@@ -66,7 +66,7 @@
       "amp": 0.5,
       "freq": 0.1
     },
-    "dropQ": 0.5,
+    "dropQ": 0.6000000000000001,
     "on": true
   },
   "thunderParams": {
